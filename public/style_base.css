@@ -1,0 +1,131 @@
+/*
+Color scheme from #43 on http://www.dtelepathy.com/blog/inspiration/beautiful-color-palettes-for-your-next-web-project
+*/
+
+body{
+	min-width:840 px;
+	margin:0;
+	background-color: rgb(88, 123, 140);
+}
+h1{
+	padding:0;
+	margin:0;
+}
+
+
+a{
+	text-decoration: none;
+}
+
+#header{
+	height:45px;
+	width:100%;
+	display:inline-block;
+	background-color: rgb(249, 188, 179);
+}
+#header h1{
+	padding-top: 3.75px;
+	padding-left: 10px;
+	text-align: left;
+	color:rgb(55,83,98);
+	font-size:200%;
+}
+
+#header a:link{
+color:rgb(55,83,98);
+
+}
+#header a:visited{
+color:rgb(55,83,98);
+
+}
+#header a:hover{
+color:rgb(70,90,120);
+
+}
+
+#chat-box{
+	display: inline-block;
+	float:center;
+	background-color: rgb(55, 83, 98);
+	height:40%;
+	max-height:40%;
+	width:75%;
+	margin:4% 12.5% 2% 12.5%;
+
+}
+#chat-box a:visited{
+	color:rgb(193,193,194);
+}
+#chat-box a:hover{
+	color:rgb(210,210,212);
+}
+#messages-box{
+	display: inline-block;
+	margin:5%;
+	max-height: 300px;
+	overflow:scroll;
+	border-style:solid;
+	border-color: rgb(135, 255, 252);
+	padding-right: 1%;
+	width:60%;
+	float:right;
+}
+#room-name{
+	color: rgb(250, 250, 250);
+	font-size: 120%;
+	text-align:center;
+}
+#room{
+	display:inline-block;
+	padding-top: .5%;
+	margin:0% 5% 0% 8%;
+}
+#member-box li{
+	display:inline;
+	color: rgb(193,193,194);
+}
+#member-box{
+	display: inline-block;
+	margin:5% 5% 5% 5% ;
+	max-height: 300px;
+	overflow:scroll;
+	border-style:solid;
+	border-color: rgb(135, 255, 252);
+	padding: 1%;
+	float:left;
+	width:15%;
+}
+#member-box p{
+	color:rgb(250,250,250);
+}
+#messages-box li{
+	display:inline;
+	color: rgb(193,193,194);
+}
+#messages-box a{
+	color: rgb(193,193,194);
+}
+.username{
+	color: rgb(250, 250, 250);
+}
+.time{
+	color: rgb(150, 150, 150);
+}
+
+#messageForm input{
+	width:70%;
+	height:30px;
+	margin:0 0 2% 10% ;
+	display:inline;
+	float:left;
+}
+
+#messageForm input[type=submit]{
+	float:right;
+	width:6%;
+	height:25px;
+	display:inline;
+	margin:1% 11% 1% 1%;
+}
+

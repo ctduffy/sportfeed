@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<head>
+	<title>"Clara's Chatroom"</title>             
+	<link rel="stylesheet" href="/style_base.css" type="text/css"/>
+	<meta name="roomName" content="{{roomName}}"/>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js"></script>
+	<script src='/socket.io/socket.io.js'></script>
+	<script src="/messages.js"></script>
+</head>
+
+<body>
+	<div id="header">
+		<h1><a href="/">Clara's Chatroom</a></h1><br>
+	</div>
+
+	<div id="chat-box">
+		<!--<div id="firstScreen">
+			<p>Type in Your username!</p>
+			<form onsubmit="return false" id="nickinput">
+				<input type="text" id="nickname_not_hidden"/>
+
+				<input 
+					type="button"    
+					onclick="toggle_visibility();" 
+					value="Go to Room!"/>
+			</form>
+		</div>!-->
+		
+		<div id="secondScreen">
+			<div id="room-name">
+				<p>You are in room: {{roomName}}</p>
+			</div>
+			<div id="member-box">
+				<p>Members:</p>
+				<ul id="memberList">
+				</ul>
+			</div>
+
+			<div id="messages-box">
+				<ul id="messages">
+					<li id="random1"><span class="username"> </span> <span class="text">Welcome to chatroom {{roomName}}</span></li><br>
+					<li id="random2"><span class="username"> </span> <span class="text">Type in a message then press send!</span></li><br>
+					<li id="ex1"><span class="username"> nickname </span> <span class="time"> (02:44:32) </span> <span class="text">This is what your message will look like</span></li><br>
+					<li id="ex1"><span class="username"> ADELE </span> <span class="time"> (02:44:37) </span> <span class="text">Hello, its me...</span></li><br>
+					<li id="ex1"><span class="username"> ADELE </span> <span class="time"> (02:44:37) </span> <span class="text">Hello, it's me
+					I was wondering if after all these years you'd like to meet
+					To go over everything
+					They say that time's supposed to heal ya
+					But I ain't done much healing
+
+					Hello, can you hear me
+					I'm in California dreaming about who we used to be
+					When we were younger and free
+					I've forgotten how it felt before the world fell at our feet
+
+					There's such a difference between us
+					And a million miles
+
+					Hello from the other side
+					I must have called a thousand times
+					To tell you I'm sorry for everything that I've done
+					But when I call you never seem to be home
+
+					Hello from the outside
+					At least I can say that I've tried
+					To tell you I'm sorry for breaking your heart
+					But it don't matter it clearly doesn't tear you apart anymore
+					</span></li><br>
+				</ul>
+			</div>
+
+			<form method="POST" onsubmit="return true" action="/{{roomName}}/messages" id="messageForm"> 
+				<input type="text" name="message" id="messageField">
+
+				<input type="hidden" name="nickname" id="nicknameField" value=""> 
+
+				<input type="submit" id="submitButton" value="Send">
+			</form>
+		</div>
+	</div>
+
+</body>

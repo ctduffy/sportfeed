@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<head>
+	<title>"Clara's Chatroom"</title>
+	<link rel="stylesheet" href="/style_base.css" type="text/css"/>
+	<!--<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+	<script src="server.js"></script>!-->
+</head>
+<body>
+	<div id="header">
+		<h1><a href="/">Clara's Chatroom</a></h1><br>
+	</div>
+	<div id="chat-box">
+		<div id="room-name">
+			<p>Choose a room to enter or create a new one!</p>
+		</div>
+		<div id="messages-box">
+			<ul id="messages" >
+				{{#roomlist}}
+				<li id={{RoomName}} ><a href="/{{RoomName}}"> room {{RoomName}}</a><br>
+				{{/roomlist}}
+				<li id="new" ><a href="/New"> Create a new room!</a><br>
+			</ul>
+		</div>
+	</div>
+</body>
