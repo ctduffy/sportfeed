@@ -1,5 +1,3 @@
-var $ = require('jquery');
-
 var http = require('http');
 var express = require('express');
 var app = express();
@@ -175,10 +173,6 @@ app.get('/:roomName', function(request, response){ //finds room and takes user t
 	});
 
 	var name = request.params.roomName; // 'ABC123' // ...
-});
-
-$( document ).ready(function() {
-    console.log( "ready!" );
 });
 
 server.listen(8080);

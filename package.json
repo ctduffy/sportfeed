@@ -9,6 +9,7 @@
 		"consolidate": "0.13.x",
 		"sqlite3": "3.1.x",
 		"any-db-sqlite3": "*",
-		"socket.io": "0.9.x"
+		"socket.io": "0.9.x",
+		"request": "4.*"
 	}
 }
