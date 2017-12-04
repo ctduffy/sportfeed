@@ -108,19 +108,26 @@ app.get('/', function(request, response){ //homepage
 	});
 	q.on('end', function(){
 		//console.log(rooms);
+		var request = require('request');
+		request('http://feeds.feedburner.com/raymondcamdensblog?format=xml', function (error, response, body) {
+		  console.log('error:', error); // Print the error if one occurred
+		  console.log('statusCode:', response && response.statusCode); // Print the response status code if a response was received
+		  console.log('body:', body); // Print the HTML for the Google homepage.
+
+		});
+		/*
 		var url = 'http://feeds.feedburner.com/raymondcamdensblog?format=xml';
 
 		var yql = "https://query.yahooapis.com/v1/public/yql?q=select%20title%2Clink%2Cdescription%20from%20rss%20where%20url%3D%22http%3A%2F%2Ffeeds.feedburner.com%2Fraymondcamdensblog%3Fformat%3Dxml%22&format=json&diagnostics=true&callback=";
 
 		var feed = "http://feeds.feedburner.com/raymondcamdensblog?format=xml";
 		request.get({
-					console.log("here");
           url: feed,
-          jar: "true",
+          jar: true,
           followAllRedirects: true
       }, function(error, response, body){
 
-          let data;
+          var data;
           try {
               data = body.match(/(?:data = \[)(.+)(?:];)/)[1]
           }
@@ -131,7 +138,7 @@ app.get('/', function(request, response){ //homepage
           return callback(players);
       });
 
-
+		*/
 		response.render('index.html',{roomlist: rooms});
 	});
 });
