@@ -1,3 +1,5 @@
+var request = require('request');
+
 var http = require('http');
 var express = require('express');
 var app = express();
@@ -111,26 +113,24 @@ app.get('/', function(request, response){ //homepage
 		var yql = "https://query.yahooapis.com/v1/public/yql?q=select%20title%2Clink%2Cdescription%20from%20rss%20where%20url%3D%22http%3A%2F%2Ffeeds.feedburner.com%2Fraymondcamdensblog%3Fformat%3Dxml%22&format=json&diagnostics=true&callback=";
 
 		var feed = "http://feeds.feedburner.com/raymondcamdensblog?format=xml";
+		request.get({
+					console.log("here");
+          url: feed,
+          jar: "true",
+          followAllRedirects: true
+      }, function(error, response, body){
 
-    // $.ajax(feed, {
-    //     accepts:{
-    //         xml:"application/rss+xml"
-    //     },
-    //     dataType:"xml",
-    //     success:function(data) {
-    //         //Credit: http://stackoverflow.com/questions/10943544/how-to-parse-an-rss-feed-using-javascript
-    //
-    //         $(data).find("item").each(function () { // or "item" or whatever suits your feed
-    //             var el = $(this);
-    //             console.log("------------------------");
-    //             console.log("title      : " + el.find("title").text());
-    //             console.log("link       : " + el.find("link").text());
-    //             console.log("description: " + el.find("description").text());
-    //         });
-    //
-    //
-    //     }
-    // });
+          let data;
+          try {
+              data = body.match(/(?:data = \[)(.+)(?:];)/)[1]
+          }
+          catch (err) {
+              return callback([])
+          }
+
+          return callback(players);
+      });
+
 
 		response.render('index.html',{roomlist: rooms});
 	});
