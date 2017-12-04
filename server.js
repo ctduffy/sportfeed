@@ -6,7 +6,7 @@ var server = http.createServer(app);
 var io = require('socket.io').listen(server);
 
 var anyDB = require('any-db');
-var conn = anyDB.createConnection('sqlite3://chatroom.db.sqlite');
+var conn = anyDB.createConnection('sqlite3://feed.db.sqlite');
 
 var engines = require('consolidate');
 app.engine('html', engines.hogan); // tell Express to run .html files through Hogan
@@ -38,13 +38,13 @@ io.sockets.on('connection', function(socket){
 		var m = conn.query('SELECT * FROM messages WHERE RoomName = $1',[roomName]);
 		m.on('data', function(row){
 			messages.push(row);
-			
+
 		});
 		m.on('end', function(){
 			//console.log(messages);
 			callback(messages);
 		});
-		
+
 	});
 
 	socket.on('nickname', function(nickname){
@@ -61,7 +61,7 @@ io.sockets.on('connection', function(socket){
 
 		var currentdate = new Date();
 		var time = currentdate.getHours() + ":" + currentdate.getMinutes() + ":" + currentdate.getSeconds();
-		
+
 		//console.log(time);
 
 		io.sockets.in(roomName).emit('message', socket.nickname, message, time);
@@ -138,7 +138,7 @@ app.get('/:roomName', function(request, response){ //finds room and takes user t
 
 	});
 	q.on('end', function(){
-		response.render('room.html', {roomName: request.params.roomName});	
+		response.render('room.html', {roomName: request.params.roomName});
 		// this code is executed after all rows have been returned
 	});
 
