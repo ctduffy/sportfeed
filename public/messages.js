@@ -13,8 +13,8 @@ window.addEventListener('load', function(){
         //console.log('#memberList');
         //console.log(members.length);
         for(var i = 0; i < members.length; i++){
-            //console.log(members[i]);  
-            if(members[i] != null){ 
+            //console.log(members[i]);
+            if(members[i] != null){
                 $('#memberList').append("<li><span class=\"member\"></span>" + members[i] + "</li><br>");
             }
         }
@@ -34,9 +34,9 @@ window.addEventListener('load', function(){
     socket.emit('join', roomName, nickname, function(messages){
         addMessages(messages);
     });
-    
+
     var messageForm = document.getElementById('messageForm');//when user tries to send message
-    messageForm.addEventListener('submit', function(event){ 
+    messageForm.addEventListener('submit', function(event){
 
         updateScroll(); //scrolls to bottom of messages div
 
@@ -44,7 +44,7 @@ window.addEventListener('load', function(){
         event.preventDefault();
         socket.emit('message', document.getElementById('messageField').value, roomName)
         document.getElementById('messageField').value='';
-    } , false); 
+    } , false);
 }, false);
 
 function addOne(nickname, message, time){
@@ -64,7 +64,7 @@ function addMessages(messages){
             data[i].nickname='Anonymous';
         }
         $('#messages').append("<li id=\"" + data[i].id + "\"> <span class=\"username\">" + data[i].nickname + ":"+"</span> <span class=\"time\">" + "(" + data[i].time + ")"+"</span> <span class=\"text\">" + data[i].message + "</span></li><br>");
-    
+
     }
 
 }
