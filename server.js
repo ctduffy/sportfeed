@@ -6,7 +6,7 @@ var server = http.createServer(app);
 var io = require('socket.io').listen(server);
 
 var anyDB = require('any-db');
-var conn = anyDB.createConnection('sqlite3://chatroom.db.sqlite');
+var conn = anyDB.createConnection('sqlite3://feed.sqlite');
 
 var engines = require('consolidate');
 app.engine('html', engines.hogan); // tell Express to run .html files through Hogan
