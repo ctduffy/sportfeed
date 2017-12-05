@@ -109,37 +109,26 @@ app.get('/', function(request, response){ //homepage
 	q.on('end', function(){
 		//console.log(rooms);
 		var request = require('request');
-		request('http://feeds.feedburner.com/raymondcamdensblog?format=xml', function (error, response, body) {
+		var games_array = []
+
+		get_game_data(games_array, "Football");
+		get_game_data(games_array, "Basketball");
+		get_game_data(games_array, "Hockey");
+
+
+
+		request('https://www.scorespro.com/rss2/live-soccer.xml', function (error, responseNew, body) {
 		  console.log('error:', error); // Print the error if one occurred
-		  console.log('statusCode:', response && response.statusCode); // Print the response status code if a response was received
-		  console.log('body:', body); // Print the HTML for the Google homepage.
-
+		  console.log('statusCode:', responseNew && responseNew.statusCode); // Print the response status code if a response was received
+		  // console.log('body:', body); // Print the HTML for the Google homepage.
+			// get_game_data(games_array, body, "Baseball");
+			console.log(games_array);
+			response.render('index.html',{roomlist: rooms, games_array: games_array});
 		});
-		/*
-		var url = 'http://feeds.feedburner.com/raymondcamdensblog?format=xml';
 
-		var yql = "https://query.yahooapis.com/v1/public/yql?q=select%20title%2Clink%2Cdescription%20from%20rss%20where%20url%3D%22http%3A%2F%2Ffeeds.feedburner.com%2Fraymondcamdensblog%3Fformat%3Dxml%22&format=json&diagnostics=true&callback=";
 
-		var feed = "http://feeds.feedburner.com/raymondcamdensblog?format=xml";
-		request.get({
-          url: feed,
-          jar: true,
-          followAllRedirects: true
-      }, function(error, response, body){
 
-          var data;
-          try {
-              data = body.match(/(?:data = \[)(.+)(?:];)/)[1]
-          }
-          catch (err) {
-              return callback([])
-          }
 
-          return callback(players);
-      });
-
-		*/
-		response.render('index.html',{roomlist: rooms});
 	});
 });
 function generateRoomIdentifier(response) { //creates random name for all new rooms
@@ -181,5 +170,39 @@ app.get('/:roomName', function(request, response){ //finds room and takes user t
 
 	var name = request.params.roomName; // 'ABC123' // ...
 });
+
+function regexMatch(regex, data){
+    var matches = [];
+    while (m = regex.exec(data)) {
+        matches.push(m[1]);
+    }
+    return matches
+}
+
+function get_game_data(games_array, sport){
+
+	request('https://www.scorespro.com/rss2/live-'+sport.toLowerCase()+'.xml', function (error, responseNew, body) {
+		console.log('error:', error); // Print the error if one occurred
+		console.log('statusCode:', responseNew && responseNew.statusCode); // Print the response status code if a response was received
+
+		var games_data = regexMatch(/<item>\s*(.*?)\s*<\/item>/g, body);
+
+		for (let i = 0; i < games_data.length; i++) {
+				var info = regexMatch(/<title>\s*(.*?)\s*<\/title>/g, games_data[i])[0];
+				var score = info.split(': ')[2].split('-');
+				games_array.push({
+						'name_team1': regexMatch(/\) #\s*(.*?)\s* vs #/g, info)[0],
+						'name_team2': regexMatch(/vs #\s*(.*?)\s*:/g, info)[0],
+						'score_team1': score[0],
+						'score_team2': score[1],
+						'status': regexMatch(/<description>\s*(.*?)\s*<\/description>/g, games_data[i])[0],
+						'sport': sport,
+				})
+		};
+
+		console.log(games_array);
+	});
+
+}
 
 server.listen(8080);

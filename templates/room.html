@@ -5,7 +5,7 @@
 		<link rel="stylesheet" href="/style_base.css" type="text/css"/>
 		<meta name="roomName" content="{{roomName}}"/>
 		<script src="js/jquery-3.2.1.min.js"></script>
-    <script src="js/jquery.tablesorter.min.js"></script>
+    <!-- <script src="js/jquery.tablesorter.min.js"></script> -->
 		<script src='/socket.io/socket.io.js'></script>
 		<script src="/messages.js"></script>
 	</head>
@@ -29,7 +29,28 @@
 		</header>
 
 		<section id="scores_area">
-			<div class="container"></div>
+			<div class="container">
+				<ul id="scores-list">
+					{{#games_array}}
+					<li>
+						<div>
+							<div id="like_area">
+
+
+								<button type="button" id="like_button"><img src="heart.jpg" style="width:20px;height:20px;"></button>
+							</div>
+
+							<div id="score_info">{{sport}} – {{status}}</div>
+							<div id="team_name">{{name_team1}}</div>
+							<div id="team_score">{{score_team1}}</div>
+							<div id="team_name">{{name_team2}}</div>
+							<div id="team_score">{{score_team2}}</div>
+
+						</div>
+					</li>
+					{{/games_array}}
+        </ul>
+			</div>
 		</section>
 
 		<section>
