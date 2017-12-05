@@ -154,7 +154,7 @@ header nav{
 }*/
 
 #scores_area{
-	height:90px;
+	height:120px;
 	width:100%;
 	/*display:inline-block;*/
 	background-color: #35424a;
@@ -324,4 +324,56 @@ header nav{
 		display:inline;
 		width: 12%;
 
+}
+
+
+#scores_area ul {
+    width: 100%;
+		color: #fff;
+    display: block;
+    white-space: nowrap;
+		overflow: auto;
+}
+#scores-list li {
+		width: 200px;
+		display: inline-block;
+		margin-top: 5px;
+    background: #2ECC71;
+    border-radius: 4px;
+		padding: 3px;
+}
+
+#score_info {
+	/*padding-bottom: 20px*/
+
+
+	/*color: #fff*/
+	margin:0;
+	padding:0;
+	border-bottom: #35424a 3px solid;
+}
+
+
+
+#team_name{
+	float:left;
+	width:80%;
+}
+
+#team_score{
+	float:right;
+	width:18%;
+	text-align: right;
+}
+
+
+#like_area{
+	/*float: center;*/
+	width: 100%;
+	text-align: center;
+}
+
+#like_button{
+	background: #2ECC71;
+	border: none;
 }
