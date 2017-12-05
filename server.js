@@ -210,7 +210,7 @@ function regexMatch(regex, data){
     while (m = regex.exec(data)) {
         matches.push(m[1]);
     }
-    return matches
+    return matches;
 }
 
 function get_game_data(games_array, sport){
@@ -221,7 +221,7 @@ function get_game_data(games_array, sport){
 
 		var games_data = regexMatch(/<item>\s*(.*?)\s*<\/item>/g, body);
 
-		for (let i = 0; i < games_data.length; i++) {
+		for (var i = 0; i < games_data.length; i++) {
 				var info = regexMatch(/<title>\s*(.*?)\s*<\/title>/g, games_data[i])[0];
 				var score = info.split(': ')[2].split('-');
 				games_array.push({
@@ -230,7 +230,7 @@ function get_game_data(games_array, sport){
 						'score_team1': score[0],
 						'score_team2': score[1],
 						'status': regexMatch(/<description>\s*(.*?)\s*<\/description>/g, games_data[i])[0],
-						'sport': sport,
+						'sport': sport
 				})
 		};
 
