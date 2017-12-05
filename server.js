@@ -41,7 +41,7 @@ io.sockets.on('connection', function(socket){
 						callback(nickname, false);
 					}
 					else{
-						users.append(nickname);
+						//users.append(nickname);
 						callback(nickname, true);
 					}
 				});
@@ -51,7 +51,7 @@ io.sockets.on('connection', function(socket){
 						callback(nickname, false);
 					}
 				else{
-						users.append(nickname);
+						//users.append(nickname);
 						callback(nickname, true);
 					}
 			}
