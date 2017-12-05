@@ -187,7 +187,7 @@ function get_game_data(games_array, sport){
 
 		var games_data = regexMatch(/<item>\s*(.*?)\s*<\/item>/g, body);
 
-		for (let i = 0; i < games_data.length; i++) {
+		for (var i = 0; i < games_data.length; i++) {
 				var info = regexMatch(/<title>\s*(.*?)\s*<\/title>/g, games_data[i])[0];
 				var score = info.split(': ')[2].split('-');
 				games_array.push({
