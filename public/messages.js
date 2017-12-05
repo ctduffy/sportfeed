@@ -1,9 +1,7 @@
 var socket = io.connect();
 
 window.addEventListener('load', function(){
-    console.log('first');
     socket.on('message', function(nickname, message, time){
-        console.log('here');
         addOne(nickname, message, time);
     });
 
