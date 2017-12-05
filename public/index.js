@@ -17,3 +17,8 @@ window.addEventListener('load', function(){
 	    });
 	}while(!(bool || nickname == 'Anonymous'));
 }, false);
+
+
+$("#like_area").click(function(data){
+	console.log(data);
+})
