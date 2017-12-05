@@ -24,6 +24,40 @@ var users = [];
 
 io.sockets.on('connection', function(socket){
 
+	socket.on('nickname', function(nickname, callback){
+		var exists = 0;
+		var old = conn.query('SELECT * FROM users WHERE name = $1', nickname);
+		old.on('data', function(row){
+			exists = 1;
+		});
+		old.on('end', function(){
+			if(exists == 0){
+				console.log(nickname);
+				console.log(nickname);
+				var newuser = conn.query("INSERT INTO users (Name) VALUES ($1)", nickname);
+				newuser.on('end', function(){
+					console.log(nickname);
+					if(users.indexOf(nickname) > -1){
+						callback(nickname, false);
+					}
+					else{
+						users.append(nickname);
+						callback(nickname, true);
+					}
+				});
+			}
+			else{
+				if(users.indexOf(nickname) > -1){
+						callback(nickname, false);
+					}
+				else{
+						users.append(nickname);
+						callback(nickname, true);
+					}
+			}
+		});
+	})
+
 	socket.on('join', function(roomName, nickname, callback){
 		socket.join(roomName);
 		socket.nickname = nickname;
@@ -176,7 +210,7 @@ function regexMatch(regex, data){
     while (m = regex.exec(data)) {
         matches.push(m[1]);
     }
-    return matches
+    return matches;
 }
 
 function get_game_data(games_array, sport){
@@ -196,7 +230,7 @@ function get_game_data(games_array, sport){
 						'score_team1': score[0],
 						'score_team2': score[1],
 						'status': regexMatch(/<description>\s*(.*?)\s*<\/description>/g, games_data[i])[0],
-						'sport': sport,
+						'sport': sport
 				})
 		};
 
