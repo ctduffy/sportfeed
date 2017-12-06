@@ -16,12 +16,14 @@ window.addEventListener('load', function(){
                 $('#memberList').append("<li><span class=\"member\"></span>" + members[i] + "</li><br>");
             }
         }
-**/
 
-    });
+
+    });**/
     var meta = document.querySelector('meta[name=roomName]');
     var roomName = meta.content;
-    var nickname = meta.content1;
+    var meta1 = document.querySelector('meta[name=nickname]');
+    var nickname = meta1.content;
+    console.log(nickname);
 /*
     var nickname = prompt('Enter a nickname: ');
     console.log(nickname);
@@ -36,14 +38,19 @@ window.addEventListener('load', function(){
 
     var messageForm = document.getElementById('messageForm');//when user tries to send message
     messageForm.addEventListener('submit', function(event){
+        if(document.getElementById('messageField').value==''){  
+            event.preventDefault();
+        }
+        else{
 
-        updateScroll(); //scrolls to bottom of messages div
+            updateScroll(); //scrolls to bottom of messages div
 
-        // prevent the page from redirecting
-        event.preventDefault();
-        socket.emit('message', document.getElementById('messageField').value, roomName)
-        document.getElementById('messageField').value='';
-    } , false);
+            // prevent the page from redirecting
+            event.preventDefault();
+            socket.emit('message', document.getElementById('messageField').value, roomName)
+            document.getElementById('messageField').value='';
+        }
+    }, false);
 }, false);
 
 function addOne(nickname, message, time){

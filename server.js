@@ -32,27 +32,25 @@ io.sockets.on('connection', function(socket){
 		});
 		old.on('end', function(){
 			if(exists == 0){
-				console.log(nickname);
-				console.log(nickname);
 				var newuser = conn.query("INSERT INTO users (Name) VALUES ($1)", nickname);
 				newuser.on('end', function(){
 					console.log(nickname);
 					if(users.indexOf(nickname) > -1){
-						callback(nickname, false);
+						callback(false);
 					}
 					else{
-						//users.append(nickname);
-						callback(nickname, true);
+						users.psuh(nickname);
+						callback(true);
 					}
 				});
 			}
 			else{
 				if(users.indexOf(nickname) > -1){
-						callback(nickname, false);
+						callback(false);
 					}
 				else{
-						//users.append(nickname);
-						callback(nickname, true);
+						users.push(nickname);
+						callback(true);
 					}
 			}
 		});
@@ -66,11 +64,11 @@ io.sockets.on('connection', function(socket){
 		//console.log(roomName);
 		//console.log(nickname);
 
-		broadcastMembership(roomName);
+		//broadcastMembership(roomName);
 
 		var messages = []; //put messages here
 
-		var m = conn.query('SELECT * FROM messages WHERE RoomName = $1',[roomName]);
+		var m = conn.query('SELECT * FROM messages WHERE RoomName = $1',roomName);
 		m.on('data', function(row){
 			messages.push(row);
 
@@ -104,11 +102,12 @@ io.sockets.on('connection', function(socket){
 
 	socket.on('disconnect', function(){
 		room = socket.room;
-		deleteMember(room, socket.nickname);
+		//deleteMember(room, socket.nickname);
 	});
 
 
 });
+/*
 function deleteMember(roomName, nickname){
 	var sockets = io.sockets.clients(roomName);
 
@@ -120,7 +119,7 @@ function deleteMember(roomName, nickname){
 
 	console.log(nicknames);
 	io.sockets.in(roomName).emit('membershipChanged', nicknames);
-}
+}*
 
 function broadcastMembership(roomName){
 	var sockets = io.sockets.clients(roomName);
@@ -131,15 +130,14 @@ function broadcastMembership(roomName){
 
 	console.log(nicknames);
 	io.sockets.in(roomName).emit('membershipChanged', nicknames);
-}
+}*/
 
-app.get('/index/:nickname', function(request, response){ //homepage
-	//nickname is stored in request.params.nickname
-	console.log(request.params.nickname);
+app.get('/index/:nickname', function(req, response){ //homepage
+	//nickname is stored in req.params.nickname
 	var rooms = [];
 	var q = conn.query('SELECT * FROM Rooms');
 	q.on('data', function(row){
-		rooms.push({RoomName:row.RoomName, nickname:request.params.nickname});
+		rooms.push({RoomName:row.RoomName, nickname:req.params.nickname});
 	});
 	q.on('end', function(){
 		//console.log(rooms);
@@ -153,35 +151,41 @@ app.get('/index/:nickname', function(request, response){ //homepage
 
 
 		request('https://www.scorespro.com/rss2/live-soccer.xml', function (error, responseNew, body) {
-		  //console.log('error:', error); // Print the error if one occurred
-		  //console.log('statusCode:', responseNew && responseNew.statusCode); // Print the response status code if a response was received
-		  // console.log('body:', body); // Print the HTML for the Google homepage.
+			//console.log('error:', error); // Print the error if one occurred
+			//console.log('statusCode:', responseNew && responseNew.statusCode); // Print the response status code if a response was received
+			// console.log('body:', body); // Print the HTML for the Google homepage.
 			// get_game_data(games_array, body, "Baseball");
 			//console.log(games_array);
 
 			var sports_likes_keys = {"Football": 0, "Basketball": 0, "Hockey": 0, "Hockey": 0}
-		  var sports = ["football", "basketball", "hockey", "baseball"]
-		  var current_id = conn.query('SELECT * FROM Users WHERE Name = $1', socket.nickname);
+			var sports = ["football", "basketball", "hockey", "baseball"]
+			var s = conn.query('SELECT * FROM Users WHERE Name = $1', req.params.nickname);
+			s.on('data', function(row){
+				current_id = row.Name;
+			});
+			s.on('end', function(){
+				j = conn.query('SELECT * FROM likes WHERE UserId = $1', current_id)
+				j.on('data', function(row){
+					console.log(row);
+				});
+				j.on('end', function(){
+					for (var i = 0; i < sports.length; i++) {
+						var number_of_likes = 0;
 
-		  for (var i = 0; i < sports.length; i++) {
-
-		    var number_of_likes = conn.query('SELECT count(sport) FROM Likes WHERE UserId = $1 AND sport = $2', current_id, sports[i])
-		    sports_likes_keys[sports[i]] = number_of_likes;
-
-		  };
-
-			games_array.sort(function(a, b) {
-	        if (sports_likes_keys[a.sport] < sports_likes_keys[b.sport]) return -1;
-	        if (sports_likes_keys[a.sport] > sports_likes_keys[b.sport]) return 1;
-	        return 0;
-	    });
-			response.render('index.html',{roomlist: rooms, games_array: games_array});
+						number_of_likes++;
+					}
+					sports_likes_keys[sports[i]] = number_of_likes;
+					games_array.sort(function(a, b) {
+						if(sports_likes_keys[a.sport] < sports_likes_keys[b.sport]) return -1;
+						if(sports_likes_keys[a.sport] > sports_likes_keys[b.sport]) return 1;
+						return 0;
+					});	
+					response.render('index.html',{roomlist: rooms, games_array: games_array});
+				
+				});
+});
+			
 		});
-
-
-
-
-
 	});
 });
 
@@ -191,9 +195,9 @@ app.get('/', function(request, response){
 
 function compare(a,b) {
   if (a.last_nom < b.last_nom)
-    return -1;
+	return -1;
   if (a.last_nom > b.last_nom)
-    return 1;
+	return 1;
   return 0;
 }
 function generateRoomIdentifier(response) { //creates random name for all new rooms
@@ -237,11 +241,11 @@ app.get('/:roomName/:named', function(request, response){ //finds room and takes
 });
 
 function regexMatch(regex, data){
-    var matches = [];
-    while (m = regex.exec(data)) {
-        matches.push(m[1]);
-    }
-    return matches;
+	var matches = [];
+	while (m = regex.exec(data)) {
+		matches.push(m[1]);
+	}
+	return matches;
 }
 
 function get_game_data(games_array, sport){
@@ -251,7 +255,7 @@ function get_game_data(games_array, sport){
 		//console.log('statusCode:', responseNew && responseNew.statusCode); // Print the response status code if a response was received
 
 		var games_data = regexMatch(/<item>\s*(.*?)\s*<\/item>/g, body);
-
+		console.log(games_data);
 		for (var i = 0; i < games_data.length; i++) {
 				var info = regexMatch(/<title>\s*(.*?)\s*<\/title>/g, games_data[i])[0];
 				var score = info.split(': ')[2].split('-');

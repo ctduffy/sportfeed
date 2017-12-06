@@ -117,7 +117,7 @@ header .current a, #info .current{
 	text-align: right;
 }
 
-#like_area{
+.like_area{
 	width: 100%;
 	text-align: center;
 }

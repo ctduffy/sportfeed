@@ -1,8 +1,19 @@
+var socket = io.connect();
+
 window.addEventListener('load', function(){
     var submitForm = document.getElementById('loginForm');//when user tries to send message
     submitForm.addEventListener('submit', function(event){ 
-        name = document.getElementById('nameField').value
+        name = document.getElementById('nameField').value;
         event.preventDefault();
-        window.location = "/index/" + name;
+        socket.emit('nickname', name, function(bool){
+        	if(bool){
+        		window.location = "/index/" + name;
+        	}
+        	else{
+        		alert("your account is being used right now!");
+        		window.location = "/";
+        	}
+    	});
+        
     } , false); 
 }, false);
