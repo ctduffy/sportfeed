@@ -1,4 +1,4 @@
-var request = require('request');
+var request_library = require('request');
 
 var http = require('http');
 var express = require('express');
@@ -143,78 +143,18 @@ function broadcastMembership(roomName){
 	io.sockets.in(roomName).emit('membershipChanged', nicknames);
 }*/
 
-app.get('/index/:nickname', function(req, response){ //homepage
+app.get('/index/:nickname', function(request, response){ //homepage
 	//nickname is stored in req.params.nickname
 	var rooms = [];
 	var q = conn.query('SELECT * FROM Rooms');
 	q.on('data', function(row){
-		rooms.push({RoomName:row.RoomName, nickname:req.params.nickname});
+		rooms.push({RoomName:row.RoomName, nickname:request.params.nickname});
 	});
 	q.on('end', function(){
-		//console.log(rooms);
-		var request = require('request');
-		var games_array = []
+		scrape_sport_scores(request, response, rooms, "index");
 
-		get_game_data(games_array, "Football");
-		get_game_data(games_array, "Basketball");
-		get_game_data(games_array, "Hockey");
-		get_game_data(games_array, "Baseball");
-
-
-
-
-		request('https://www.scorespro.com/rss2/live-soccer.xml', function (error, responseNew, body) {
-			//console.log('error:', error); // Print the error if one occurred
-			//console.log('statusCode:', responseNew && responseNew.statusCode); // Print the response status code if a response was received
-			// console.log('body:', body); // Print the HTML for the Google homepage.
-			// get_game_data(games_array, body, "Baseball");
-			//console.log(games_array);
-
-			var games_data = regexMatch(/<item>\s*(.*?)\s*<\/item>/g, body);
-			for (var i = 0; i < games_data.length; i++) {
-					var info = (regexMatch(/\) \s*(.*?)\s*: /g, games_data[i])[0]).split(' vs ');
-					var score = regexMatch(/<description>\s*(.*?)\s*<\/description>/g, games_data)[0].split(': ')[1].split('-');
-					var id = regexMatch(/<link>\s*(.*?)\s*<\/link>/g, games_data[i])[0];
-					games_array.push({
-							'name_team1': info[0],
-							'name_team2': info[1],
-							'score_team1': score[0],
-							'score_team2': score[1],
-							'status': score[2],
-							'sport': "Soccer",
-							'id': id.split('livescore/')[1]
-					})
-			};
-
-			var sports_likes_keys = {"Football": 0, "Basketball": 0, "Hockey": 0, "Baseball": 0, "Soccer": 0}
-			var sports = ["Football", "Basketball", "Hockey", "Baseball", "Soccer"]
-			var s = conn.query('SELECT * FROM Users WHERE Name = $1', req.params.nickname);
-			s.on('data', function(row){
-				current_id = row.id;
-			});
-			s.on('end', function(){
-				j = conn.query('SELECT * FROM likes WHERE UserId = $1', current_id)
-				j.on('data', function(row){
-					console.log(row);
-				});
-				j.on('end', function(){
-					for (var i = 0; i < sports.length; i++) {
-						var number_of_likes = 0;
-
-						number_of_likes++;
-					}
-					sports_likes_keys[sports[i]] = number_of_likes;
-					games_array.sort(function(a, b) {
-						if(sports_likes_keys[a.sport] < sports_likes_keys[b.sport]) return 1;
-						if(sports_likes_keys[a.sport] > sports_likes_keys[b.sport]) return -1;
-						return 0;
-					});
-					//console.log(games_array);
-					response.render('index.html',{nickname: req.params.nickname, roomlist: rooms, games_array: games_array});
-				});
-			});
-		});
 	});
+
 });
 
 app.get('/', function(request, response){
@@ -230,13 +170,13 @@ app.get('/New/:name/:user', function(request, response){ //if there is a request
 	});
 });
 
-app.get('/:roomName/:named', function(request, response){ //finds room and takes user to the page and fills out the room template so that it appears as the correct room
+app.get('/:roomName/:nickname', function(request, response){ //finds room and takes user to the page and fills out the room template so that it appears as the correct room
 	var q = conn.query('SELECT * FROM Rooms WHERE RoomName = $1', [request.params.roomName]);
 	q.on('data', function(row){
 
 	});
 	q.on('end', function(){
-		response.render('room.html', {roomName: request.params.roomName, nickname: request.params.named});
+		scrape_sport_scores(request, response, "rooms", "room");
 		// this code is executed after all rows have been returned
 	});
 
@@ -282,12 +222,10 @@ function regexMatch(regex, data){
 
 function get_game_data(games_array, sport){
 
-	request('https://www.scorespro.com/rss2/live-'+sport.toLowerCase()+'.xml', function (error, responseNew, body) {
-		//console.log('error:', error); // Print the error if one occurred
-		//console.log('statusCode:', responseNew && responseNew.statusCode); // Print the response status code if a response was received
+	request_library('https://www.scorespro.com/rss2/live-'+sport.toLowerCase()+'.xml', function (error, responseNew, body) {
 
 		var games_data = regexMatch(/<item>\s*(.*?)\s*<\/item>/g, body);
-		//console.log(games_data);
+
 		for (var i = 0; i < games_data.length; i++) {
 				var info = regexMatch(/<title>\s*(.*?)\s*<\/title>/g, games_data[i])[0];
 				var score = info.split(': ')[2].split('-');
@@ -303,9 +241,66 @@ function get_game_data(games_array, sport){
 				})
 		};
 
-		// console.log(games_array);
 	});
 
+}
+
+function scrape_sport_scores(request, response, rooms, render_type){
+
+	var games_array = []
+
+	get_game_data(games_array, "Football");
+	get_game_data(games_array, "Basketball");
+	get_game_data(games_array, "Hockey");
+	get_game_data(games_array, "Baseball");
+
+	// function for scraping soccer data is slightly different due to differences in the website we are scraping
+	request_library('https://www.scorespro.com/rss2/live-soccer.xml', function (error, responseNew, body) {
+
+		var games_data = regexMatch(/<item>\s*(.*?)\s*<\/item>/g, body);
+		for (var i = 0; i < games_data.length; i++) {
+				var info = (regexMatch(/\) \s*(.*?)\s*: /g, games_data[i])[0]).split(' vs ');
+				var score = regexMatch(/<description>\s*(.*?)\s*<\/description>/g, games_data)[0].split(': ')[1].split('-');
+				var status = "";
+				if (score[2].includes("Goal for")) status = "Goal Scored";
+				else status = score[2];
+				var id = regexMatch(/<link>\s*(.*?)\s*<\/link>/g, games_data[i])[0];
+				games_array.push({
+						'name_team1': info[0],
+						'name_team2': info[1],
+						'score_team1': score[0],
+						'score_team2': score[1],
+						'status': score[2],
+						'sport': "Soccer",
+						'id': id.split('livescore/')[1]
+				})
+		};
+
+		var sports_likes_keys = {"Football": 0, "Basketball": 0, "Hockey": 0, "Baseball": 0, "Soccer": 0}
+		var sports = ["Football", "Basketball", "Hockey", "Baseball", "Soccer"]
+		var s = conn.query('SELECT * FROM Users WHERE Name = $1', request.params.nickname);
+		s.on('data', function(row){
+			current_id = row.id;
+		});
+		s.on('end', function(){
+			j = conn.query('SELECT * FROM likes WHERE UserId = $1', current_id)
+			j.on('data', function(row){
+				sports_likes_keys[row['sport']]++;
+			});
+			j.on('end', function(){
+
+				games_array.sort(function(a, b) {
+					if(sports_likes_keys[a.sport] < sports_likes_keys[b.sport]) return 1;
+					if(sports_likes_keys[a.sport] > sports_likes_keys[b.sport]) return -1;
+					return 0;
+				});
+
+				if(render_type == "index") response.render('index.html',{nickname: request.params.nickname, roomlist: rooms, games_array: games_array});
+				else if (render_type == "room") response.render('room.html', {roomName: request.params.roomName, nickname: request.params.nickname, games_array: games_array});
+
+			});
+		});
+	});
 }
 
 server.listen(8080);
