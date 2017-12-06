@@ -158,6 +158,8 @@ app.get('/index/:nickname', function(req, response){ //homepage
 		get_game_data(games_array, "Football");
 		get_game_data(games_array, "Basketball");
 		get_game_data(games_array, "Hockey");
+		get_game_data(games_array, "Baseball");
+
 
 
 
@@ -168,8 +170,24 @@ app.get('/index/:nickname', function(req, response){ //homepage
 			// get_game_data(games_array, body, "Baseball");
 			//console.log(games_array);
 
-			var sports_likes_keys = {"Football": 0, "Basketball": 0, "Hockey": 0, "Hockey": 0}
-			var sports = ["football", "basketball", "hockey", "baseball"]
+			var games_data = regexMatch(/<item>\s*(.*?)\s*<\/item>/g, body);
+			for (var i = 0; i < games_data.length; i++) {
+					var info = (regexMatch(/\) \s*(.*?)\s*: /g, games_data[i])[0]).split(' vs ');
+					var score = regexMatch(/<description>\s*(.*?)\s*<\/description>/g, games_data)[0].split(': ')[1].split('-');
+					var id = regexMatch(/<link>\s*(.*?)\s*<\/link>/g, games_data[i])[0];
+					games_array.push({
+							'name_team1': info[0],
+							'name_team2': info[1],
+							'score_team1': score[0],
+							'score_team2': score[1],
+							'status': score[2],
+							'sport': "Soccer",
+							'id': id.split('livescore/')[1]
+					})
+			};
+
+			var sports_likes_keys = {"Football": 0, "Basketball": 0, "Hockey": 0, "Baseball": 0, "Soccer": 0}}
+			var sports = ["Football", "Basketball", "Hockey", "Baseball", "Soccer"]
 			var s = conn.query('SELECT * FROM Users WHERE Name = $1', req.params.nickname);
 			s.on('data', function(row){
 				current_id = row.Name;
@@ -192,10 +210,8 @@ app.get('/index/:nickname', function(req, response){ //homepage
 						return 0;
 					});	
 					response.render('index.html',{nickname: req.params.nickname, roomlist: rooms, games_array: games_array});
-				
 				});
-});
-			
+			});
 		});
 	});
 });
@@ -271,17 +287,19 @@ function get_game_data(games_array, sport){
 		for (var i = 0; i < games_data.length; i++) {
 				var info = regexMatch(/<title>\s*(.*?)\s*<\/title>/g, games_data[i])[0];
 				var score = info.split(': ')[2].split('-');
+				var id = regexMatch(/<guid>\s*(.*?)\s*<\/guid>/g, games_data[i])[0];
 				games_array.push({
 						'name_team1': regexMatch(/\) #\s*(.*?)\s* vs #/g, info)[0],
 						'name_team2': regexMatch(/vs #\s*(.*?)\s*:/g, info)[0],
 						'score_team1': score[0],
 						'score_team2': score[1],
 						'status': regexMatch(/<description>\s*(.*?)\s*<\/description>/g, games_data[i])[0],
-						'sport': sport
+						'sport': sport,
+						'id': id.split('livescore/')[1]
 				})
 		};
 
-		//console.log(games_array);
+		// console.log(games_array);
 	});
 
 }
