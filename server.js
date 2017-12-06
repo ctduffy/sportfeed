@@ -209,7 +209,7 @@ app.get('/index/:nickname', function(req, response){ //homepage
 						if(sports_likes_keys[a.sport] > sports_likes_keys[b.sport]) return -1;
 						return 0;
 					});
-					console.log(games_array);
+					//console.log(games_array);
 					response.render('index.html',{nickname: req.params.nickname, roomlist: rooms, games_array: games_array});
 				});
 			});
@@ -221,8 +221,13 @@ app.get('/', function(request, response){
 	response.render('login.html');
 });
 
-app.get('/New/:name', function(request, response){ //if there is a request for a new room, create a random name and redirect the user to the page with that as its name
-	generateRoomIdentifier(request.params.name, response);
+app.get('/New/:name/:user', function(request, response){ //if there is a request for a new room, create a random name and redirect the user to the page with that as its name
+	generateRoomIdentifier(request.params.name, function(worked){
+		if(worked == true){
+			response.redirect('/index/' + request.params.user);
+	}
+
+	});
 });
 
 app.get('/:roomName/:named', function(request, response){ //finds room and takes user to the page and fills out the room template so that it appears as the correct room
@@ -250,21 +255,19 @@ function compare(a,b) {
 	return 1;
   return 0;
 }
-function generateRoomIdentifier(name, response) { //creates random name for all new rooms
-	//console.log('new');
+function generateRoomIdentifier(name, callback) { //creates random name for all new rooms
 	var tried = 0
 	var z = conn.query('SELECT * FROM Rooms WHERE RoomName == $1', [name]);
 	z.on('data', function(row){//if the room already exists
-		socket.emit('retry');
-		tried ++;
+		tried = 1;
 	});
 	z.on('end', function(){
 		if(tried == 0){
 			var x = conn.query('INSERT INTO Rooms VALUES ($1)', [name]);
-			x.on('end', function(res){
-				console.log(res);
-				response.redirect('/'+name);
-			});
+			callback(true);
+		}
+		else{
+			callback(false);
 		}
 	});
 };

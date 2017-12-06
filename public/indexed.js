@@ -19,17 +19,16 @@ window.addEventListener('load', function(){
 }, false);
 */
 window.addEventListener('load', function(){
+	var user = document.querySelector('meta[name=nickname]').content;
 	$(".like_area").click(function(data){
 		var sport = $(this).attr("id");
-   		var user = document.querySelector('meta[name=nickname]').content;
    		socket.emit('like', sport, user);
 	});
 	var submitform = document.getElementById('loginForm');
 	submitform.addEventListener('submit', function(event){ 
-		alert("ya");
         event.preventDefault();
         name = document.getElementById('nameField').value;
-      	window.location = "/new/" + name;
+      	window.location = "/new/" + name + "/" + user;
     });
 });
 socket.on('retry', function(){
