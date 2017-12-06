@@ -150,12 +150,29 @@ app.get('/index/:nickname', function(req, response){ //homepage
 
 
 
+
 		request('https://www.scorespro.com/rss2/live-soccer.xml', function (error, responseNew, body) {
 			//console.log('error:', error); // Print the error if one occurred
 			//console.log('statusCode:', responseNew && responseNew.statusCode); // Print the response status code if a response was received
 			// console.log('body:', body); // Print the HTML for the Google homepage.
 			// get_game_data(games_array, body, "Baseball");
 			//console.log(games_array);
+
+			var games_data = regexMatch(/<item>\s*(.*?)\s*<\/item>/g, body);
+			for (var i = 0; i < games_data.length; i++) {
+					var info = (regexMatch(/\) \s*(.*?)\s*: /g, games_data[i])[0]).split(' vs ');
+					var score = regexMatch(/<description>\s*(.*?)\s*<\/description>/g, games_data)[0].split(': ')[1].split('-');
+					var id = regexMatch(/<link>\s*(.*?)\s*<\/link>/g, games_data[i])[0];
+					games_array.push({
+							'name_team1': info[0],
+							'name_team2': info[1],
+							'score_team1': score[0],
+							'score_team2': score[1],
+							'status': score[2],
+							'sport': "Soccer",
+							'id': id.split('livescore/')[1]
+					})
+			};
 
 			var sports_likes_keys = {"Football": 0, "Basketball": 0, "Hockey": 0, "Hockey": 0}
 			var sports = ["football", "basketball", "hockey", "baseball"]
@@ -179,12 +196,12 @@ app.get('/index/:nickname', function(req, response){ //homepage
 						if(sports_likes_keys[a.sport] < sports_likes_keys[b.sport]) return -1;
 						if(sports_likes_keys[a.sport] > sports_likes_keys[b.sport]) return 1;
 						return 0;
-					});	
+					});
 					response.render('index.html',{roomlist: rooms, games_array: games_array});
-				
+
 				});
 });
-			
+
 		});
 	});
 });
@@ -259,17 +276,19 @@ function get_game_data(games_array, sport){
 		for (var i = 0; i < games_data.length; i++) {
 				var info = regexMatch(/<title>\s*(.*?)\s*<\/title>/g, games_data[i])[0];
 				var score = info.split(': ')[2].split('-');
+				var id = regexMatch(/<guid>\s*(.*?)\s*<\/guid>/g, games_data[i])[0];
 				games_array.push({
 						'name_team1': regexMatch(/\) #\s*(.*?)\s* vs #/g, info)[0],
 						'name_team2': regexMatch(/vs #\s*(.*?)\s*:/g, info)[0],
 						'score_team1': score[0],
 						'score_team2': score[1],
 						'status': regexMatch(/<description>\s*(.*?)\s*<\/description>/g, games_data[i])[0],
-						'sport': sport
+						'sport': sport,
+						'id': id.split('livescore/')[1]
 				})
 		};
 
-		//console.log(games_array);
+		// console.log(games_array);
 	});
 
 }
