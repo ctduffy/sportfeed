@@ -59,7 +59,7 @@ io.sockets.on('connection', function(socket){
 	socket.on('join', function(roomName, nickname, callback){
 		socket.join(roomName);
 		socket.nickname = nickname;
-		socket.room=roomName;
+		socket.room = roomName;
 		//console.log(socket.room)
 		//console.log(roomName);
 		//console.log(nickname);
@@ -113,25 +113,21 @@ io.sockets.on('connection', function(socket){
 
 	socket.on('disconnect', function(){
 		room = socket.room;
-		//deleteMember(room, socket.nickname);
+		deleteMember(socket.nickname);
 	});
 
 
 });
-/*
-function deleteMember(roomName, nickname){
-	var sockets = io.sockets.clients(roomName);
 
-	var nicknames = sockets.map(function(socket){
-		if(socket.nickname!= nickname){
-			return socket.nickname
+function deleteMember(nickname){
+	var nicknames = users.map(function(user){
+		if(user!=nickname){
+			return user;
 		}
 	});
-
-	console.log(nicknames);
-	io.sockets.in(roomName).emit('membershipChanged', nicknames);
-}*
-
+	users = nicknames;
+}
+/*
 function broadcastMembership(roomName){
 	var sockets = io.sockets.clients(roomName);
 
