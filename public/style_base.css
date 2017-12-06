@@ -73,6 +73,50 @@ header .current a, #info .current{
     font-weight: bold;
 }
 
+/* Login Page */
+#login_top{
+	margin-top:70px;
+	font-size:25px;
+}
+
+#login_container{
+	width: 40%;
+	margin: auto;
+	overflow: hidden;
+}
+
+#loginForm input{
+	height:32px;
+	border: 1px solid grey;
+  border-radius: 4px;
+	font-size: 20px;
+	color: #000;
+}
+
+#loginForm input[type=submit]{
+	height:37px;
+	color: #2ECC71;
+	margin-bottom: 60px;
+}
+
+#page_info{
+	width: 70%;
+	margin: auto;
+	overflow: hidden;
+	border: 5px solid #0f4d92;
+	padding: 5px;
+	text-align: center;
+	font-size: 20px;
+}
+
+#about_us{
+	float:center;
+	text-align: center;
+	font-size: 30px;
+	color: #FFCC00;
+	font-weight: bold;
+}
+
 
 /* Sport Banner Scores */
 #scores_area{
@@ -242,4 +286,35 @@ header .current a, #info .current{
 		float:right;
 		display:inline;
 		width: 12%;
+}
+
+#roomForm input{
+	width:67%;
+	height:32px;
+	margin-top: 5px;
+	background: #2ECC71;
+	border: 0;
+	font-size: 16px;
+	color: #fff;
+	float:left;
+	display:inline;
+}
+
+#roomForm input[type=submit]{
+	float:right;
+	width:30%;
+	height:35px;
+	display:inline;
+}
+
+#submit_room_button{
+    height: 35px;
+		margin-top: 5px;
+    background: #2ECC71;
+    border: 0;
+    font-size: 16px;
+    color: #fff;
+		float:right;
+		display:inline;
+		width: 25%;
 }

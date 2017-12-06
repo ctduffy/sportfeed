@@ -39,7 +39,7 @@ io.sockets.on('connection', function(socket){
 						callback(false);
 					}
 					else{
-						users.psuh(nickname);
+						users.push(nickname);
 						callback(true);
 					}
 				});
@@ -151,9 +151,7 @@ app.get('/index/:nickname', function(request, response){ //homepage
 		rooms.push({RoomName:row.RoomName, nickname:request.params.nickname});
 	});
 	q.on('end', function(){
-
 		scrape_sport_scores(request, response, rooms, "index");
-
 
 	});
 
@@ -163,8 +161,11 @@ app.get('/', function(request, response){
 	response.render('login.html');
 });
 
-app.get('/New/:name', function(request, response){ //if there is a request for a new room, create a random name and redirect the user to the page with that as its name
-	generateRoomIdentifier(request.params.name, response);
+app.get('/New/:name/:user', function(request, response){ //if there is a request for a new room, create a random name and redirect the user to the page with that as its name
+	generateRoomIdentifier(request.params.name, function(worked){
+		console.log(worked)
+		response.redirect('/index/' + request.params.user);
+	});
 });
 
 app.get('/:roomName/:nickname', function(request, response){ //finds room and takes user to the page and fills out the room template so that it appears as the correct room
@@ -185,22 +186,26 @@ app.get('/:roomName/:nickname', function(request, response){ //finds room and ta
 	var name = request.params.roomName; // 'ABC123' // ...
 });
 
-
-function generateRoomIdentifier(name, response) { //creates random name for all new rooms
-	//console.log('new');
+function compare(a,b) {
+  if (a.last_nom < b.last_nom)
+	return -1;
+  if (a.last_nom > b.last_nom)
+	return 1;
+  return 0;
+}
+function generateRoomIdentifier(name, callback) { //creates random name for all new rooms
 	var tried = 0
 	var z = conn.query('SELECT * FROM Rooms WHERE RoomName == $1', [name]);
 	z.on('data', function(row){//if the room already exists
-		socket.emit('retry');
-		tried ++;
+		tried = 1;
 	});
 	z.on('end', function(){
 		if(tried == 0){
 			var x = conn.query('INSERT INTO Rooms VALUES ($1)', [name]);
-			x.on('end', function(res){
-				console.log(res);
-				response.redirect('/'+name);
-			});
+			callback(true);
+		}
+		else{
+			callback(false);
 		}
 	});
 };
@@ -263,14 +268,13 @@ function scrape_sport_scores(request, response, rooms, render_type){
 						'name_team2': info[1],
 						'score_team1': score[0],
 						'score_team2': score[1],
-						'status': score[2],
+						'status': status,
 						'sport': "Soccer",
 						'id': id.split('livescore/')[1]
 				})
 		};
 
 		var sports_likes_keys = {"Football": 0, "Basketball": 0, "Hockey": 0, "Baseball": 0, "Soccer": 0}
-		var sports = ["Football", "Basketball", "Hockey", "Baseball", "Soccer"]
 		var s = conn.query('SELECT * FROM Users WHERE Name = $1', request.params.nickname);
 		s.on('data', function(row){
 			current_id = row.id;
