@@ -39,7 +39,7 @@ io.sockets.on('connection', function(socket){
 						callback(false);
 					}
 					else{
-						users.psuh(nickname);
+						users.push(nickname);
 						callback(true);
 					}
 				});
@@ -163,10 +163,8 @@ app.get('/', function(request, response){
 
 app.get('/New/:name/:user', function(request, response){ //if there is a request for a new room, create a random name and redirect the user to the page with that as its name
 	generateRoomIdentifier(request.params.name, function(worked){
-		if(worked == true){
-			response.redirect('/index/' + request.params.user);
-	}
-
+		console.log(worked)
+		response.redirect('/index/' + request.params.user);
 	});
 });
 
