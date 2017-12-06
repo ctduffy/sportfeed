@@ -158,17 +158,44 @@ app.get('/index/:nickname', function(request, response){ //homepage
 		  // console.log('body:', body); // Print the HTML for the Google homepage.
 			// get_game_data(games_array, body, "Baseball");
 			//console.log(games_array);
+
+			var sports_likes_keys = {"Football": 0, "Basketball": 0, "Hockey": 0, "Hockey": 0}
+		  var sports = ["football", "basketball", "hockey", "baseball"]
+		  var current_id = conn.query('SELECT * FROM Users WHERE Name = $1', socket.nickname);
+
+		  for (var i = 0; i < sports.length; i++) {
+
+		    var number_of_likes = conn.query('SELECT count(sport) FROM Likes WHERE UserId = $1 AND sport = $2', current_id, sports[i])
+		    sports_likes_keys[sports[i]] = number_of_likes;
+
+		  };
+
+			games_array.sort(function(a, b) {
+	        if (sports_likes_keys[a.sport] < sports_likes_keys[b.sport]) return -1;
+	        if (sports_likes_keys[a.sport] > sports_likes_keys[b.sport]) return 1;
+	        return 0;
+	    });
 			response.render('index.html',{roomlist: rooms, games_array: games_array});
 		});
 
 
 
 
+
 	});
 });
+
 app.get('/', function(request, response){
 	response.render('login.html');
 });
+
+function compare(a,b) {
+  if (a.last_nom < b.last_nom)
+    return -1;
+  if (a.last_nom > b.last_nom)
+    return 1;
+  return 0;
+}
 function generateRoomIdentifier(response) { //creates random name for all new rooms
 	//console.log('new');
 	var name = "";
