@@ -77,11 +77,22 @@ io.sockets.on('connection', function(socket){
 			//console.log(messages);
 			callback(messages);
 		});
-
 	});
 
 	socket.on('nickname', function(nickname){
 		socket.nickname = nickname;
+	});
+
+	socket.on('like', function(sport, user){
+		var userid;
+		var l = conn.query('SELECT id FROM users WHERE Name = $1', user);
+		l.on('data', function(row){
+			console.log(row.id);
+			userid = row.id;
+		});
+		l.on('end', function(){
+			var n = conn.query('INSERT INTO likes (UserId, sport) VALUES ($1, $2)', [userid, sport]);
+		})
 	});
 
 	socket.on('message', function(message, roomName){
@@ -180,7 +191,7 @@ app.get('/index/:nickname', function(req, response){ //homepage
 						if(sports_likes_keys[a.sport] > sports_likes_keys[b.sport]) return 1;
 						return 0;
 					});	
-					response.render('index.html',{roomlist: rooms, games_array: games_array});
+					response.render('index.html',{nickname: req.params.nickname, roomlist: rooms, games_array: games_array});
 				
 				});
 });
@@ -193,33 +204,8 @@ app.get('/', function(request, response){
 	response.render('login.html');
 });
 
-function compare(a,b) {
-  if (a.last_nom < b.last_nom)
-	return -1;
-  if (a.last_nom > b.last_nom)
-	return 1;
-  return 0;
-}
-function generateRoomIdentifier(response) { //creates random name for all new rooms
-	//console.log('new');
-	var name = "";
-	var chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
-	for (var i = 0; i < 6; i++){ //for statement to make a new roomname
-		name += chars.charAt(Math.floor(Math.random() * chars.length));
-	}
-
-	var z = conn.query('SELECT * FROM Rooms WHERE RoomName == $1', [name]);
-	z.on('data', function(row){//if the room already exists
-		generateRoomIdentifier(response);
-	});
-	z.on('end', function(){
-		//console.log(result);
-		var x = conn.query('INSERT INTO Rooms VALUES ($1)', [name]);
-		response.redirect('/'+name);
-	});
-};
-app.get('/New', function(request, response){ //if there is a request for a new room, create a random name and redirect the user to the page with that as its name
-	generateRoomIdentifier(response);
+app.get('/New/:name', function(request, response){ //if there is a request for a new room, create a random name and redirect the user to the page with that as its name
+	generateRoomIdentifier(request.params.name, response);
 });
 
 app.get('/:roomName/:named', function(request, response){ //finds room and takes user to the page and fills out the room template so that it appears as the correct room
@@ -240,6 +226,32 @@ app.get('/:roomName/:named', function(request, response){ //finds room and takes
 	var name = request.params.roomName; // 'ABC123' // ...
 });
 
+function compare(a,b) {
+  if (a.last_nom < b.last_nom)
+	return -1;
+  if (a.last_nom > b.last_nom)
+	return 1;
+  return 0;
+}
+function generateRoomIdentifier(name, response) { //creates random name for all new rooms
+	//console.log('new');
+	var tried = 0
+	var z = conn.query('SELECT * FROM Rooms WHERE RoomName == $1', [name]);
+	z.on('data', function(row){//if the room already exists
+		socket.emit('retry');
+		tried ++;
+	});
+	z.on('end', function(){
+		if(tried == 0){
+			var x = conn.query('INSERT INTO Rooms VALUES ($1)', [name]);
+			x.on('end', function(res){
+				console.log(res);
+				response.redirect('/'+name);
+			});
+		}
+	});
+};
+
 function regexMatch(regex, data){
 	var matches = [];
 	while (m = regex.exec(data)) {
@@ -255,7 +267,7 @@ function get_game_data(games_array, sport){
 		//console.log('statusCode:', responseNew && responseNew.statusCode); // Print the response status code if a response was received
 
 		var games_data = regexMatch(/<item>\s*(.*?)\s*<\/item>/g, body);
-		console.log(games_data);
+		//console.log(games_data);
 		for (var i = 0; i < games_data.length; i++) {
 				var info = regexMatch(/<title>\s*(.*?)\s*<\/title>/g, games_data[i])[0];
 				var score = info.split(': ')[2].split('-');
