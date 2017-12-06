@@ -208,7 +208,8 @@ app.get('/index/:nickname', function(req, response){ //homepage
 						if(sports_likes_keys[a.sport] < sports_likes_keys[b.sport]) return 1;
 						if(sports_likes_keys[a.sport] > sports_likes_keys[b.sport]) return -1;
 						return 0;
-					});	
+					});
+					console.log(games_array);
 					response.render('index.html',{nickname: req.params.nickname, roomlist: rooms, games_array: games_array});
 				});
 			});
