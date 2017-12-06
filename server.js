@@ -186,11 +186,11 @@ app.get('/index/:nickname', function(req, response){ //homepage
 					})
 			};
 
-			var sports_likes_keys = {"Football": 0, "Basketball": 0, "Hockey": 0, "Baseball": 0, "Soccer": 0}}
+			var sports_likes_keys = {"Football": 0, "Basketball": 0, "Hockey": 0, "Baseball": 0, "Soccer": 0}
 			var sports = ["Football", "Basketball", "Hockey", "Baseball", "Soccer"]
 			var s = conn.query('SELECT * FROM Users WHERE Name = $1', req.params.nickname);
 			s.on('data', function(row){
-				current_id = row.Name;
+				current_id = row.id;
 			});
 			s.on('end', function(){
 				j = conn.query('SELECT * FROM likes WHERE UserId = $1', current_id)
@@ -205,8 +205,8 @@ app.get('/index/:nickname', function(req, response){ //homepage
 					}
 					sports_likes_keys[sports[i]] = number_of_likes;
 					games_array.sort(function(a, b) {
-						if(sports_likes_keys[a.sport] < sports_likes_keys[b.sport]) return -1;
-						if(sports_likes_keys[a.sport] > sports_likes_keys[b.sport]) return 1;
+						if(sports_likes_keys[a.sport] < sports_likes_keys[b.sport]) return 1;
+						if(sports_likes_keys[a.sport] > sports_likes_keys[b.sport]) return -1;
 						return 0;
 					});	
 					response.render('index.html',{nickname: req.params.nickname, roomlist: rooms, games_array: games_array});

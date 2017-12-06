@@ -24,7 +24,9 @@ window.addEventListener('load', function(){
    		var user = document.querySelector('meta[name=nickname]').content;
    		socket.emit('like', sport, user);
 	});
-	$('loginForm').addEventListener('submit', function(event){ 
+	var submitform = document.getElementById('loginForm');
+	submitform.addEventListener('submit', function(event){ 
+		alert("ya");
         event.preventDefault();
         name = document.getElementById('nameField').value;
       	window.location = "/new/" + name;
