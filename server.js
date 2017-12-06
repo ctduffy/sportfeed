@@ -147,6 +147,7 @@ app.get('/index/:nickname', function(req, response){ //homepage
 		get_game_data(games_array, "Football");
 		get_game_data(games_array, "Basketball");
 		get_game_data(games_array, "Hockey");
+		get_game_data(games_array, "Baseball");
 
 
 
@@ -174,8 +175,8 @@ app.get('/index/:nickname', function(req, response){ //homepage
 					})
 			};
 
-			var sports_likes_keys = {"Football": 0, "Basketball": 0, "Hockey": 0, "Hockey": 0}
-			var sports = ["football", "basketball", "hockey", "baseball"]
+			var sports_likes_keys = {"Football": 0, "Basketball": 0, "Hockey": 0, "Baseball": 0, "Soccer": 0}}
+			var sports = ["football", "basketball", "hockey", "baseball", "soccer"]
 			var s = conn.query('SELECT * FROM Users WHERE Name = $1', req.params.nickname);
 			s.on('data', function(row){
 				current_id = row.Name;
