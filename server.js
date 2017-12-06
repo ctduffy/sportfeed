@@ -176,7 +176,7 @@ app.get('/index/:nickname', function(req, response){ //homepage
 			};
 
 			var sports_likes_keys = {"Football": 0, "Basketball": 0, "Hockey": 0, "Baseball": 0, "Soccer": 0}}
-			var sports = ["football", "basketball", "hockey", "baseball", "soccer"]
+			var sports = ["Football", "Basketball", "Hockey", "Baseball", "Soccer"]
 			var s = conn.query('SELECT * FROM Users WHERE Name = $1', req.params.nickname);
 			s.on('data', function(row){
 				current_id = row.Name;
