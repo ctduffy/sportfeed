@@ -133,12 +133,13 @@ function broadcastMembership(roomName){
 	io.sockets.in(roomName).emit('membershipChanged', nicknames);
 }
 
-app.get('/', function(request, response){ //homepage
+app.get('/index/:nickname', function(request, response){ //homepage
+	//nickname is stored in request.params.nickname
+	console.log(request.params.nickname);
 	var rooms = [];
 	var q = conn.query('SELECT * FROM Rooms');
 	q.on('data', function(row){
-
-		rooms.push({RoomName:row.RoomName});
+		rooms.push({RoomName:row.RoomName, nickname:request.params.nickname});
 	});
 	q.on('end', function(){
 		//console.log(rooms);
@@ -152,11 +153,11 @@ app.get('/', function(request, response){ //homepage
 
 
 		request('https://www.scorespro.com/rss2/live-soccer.xml', function (error, responseNew, body) {
-		  console.log('error:', error); // Print the error if one occurred
-		  console.log('statusCode:', responseNew && responseNew.statusCode); // Print the response status code if a response was received
+		  //console.log('error:', error); // Print the error if one occurred
+		  //console.log('statusCode:', responseNew && responseNew.statusCode); // Print the response status code if a response was received
 		  // console.log('body:', body); // Print the HTML for the Google homepage.
 			// get_game_data(games_array, body, "Baseball");
-			console.log(games_array);
+			//console.log(games_array);
 			response.render('index.html',{roomlist: rooms, games_array: games_array});
 		});
 
@@ -164,6 +165,9 @@ app.get('/', function(request, response){ //homepage
 
 
 	});
+});
+app.get('/', function(request, response){
+	response.render('login.html');
 });
 function generateRoomIdentifier(response) { //creates random name for all new rooms
 	//console.log('new');
@@ -187,13 +191,13 @@ app.get('/New', function(request, response){ //if there is a request for a new r
 	generateRoomIdentifier(response);
 });
 
-app.get('/:roomName', function(request, response){ //finds room and takes user to the page and fills out the room template so that it appears as the correct room
+app.get('/:roomName/:named', function(request, response){ //finds room and takes user to the page and fills out the room template so that it appears as the correct room
 	var q = conn.query('SELECT * FROM Rooms WHERE RoomName = $1', [request.params.roomName]);
 	q.on('data', function(row){
 
 	});
 	q.on('end', function(){
-		response.render('room.html', {roomName: request.params.roomName});
+		response.render('room.html', {roomName: request.params.roomName, nickname: request.params.named});
 		// this code is executed after all rows have been returned
 	});
 
@@ -216,8 +220,8 @@ function regexMatch(regex, data){
 function get_game_data(games_array, sport){
 
 	request('https://www.scorespro.com/rss2/live-'+sport.toLowerCase()+'.xml', function (error, responseNew, body) {
-		console.log('error:', error); // Print the error if one occurred
-		console.log('statusCode:', responseNew && responseNew.statusCode); // Print the response status code if a response was received
+		//console.log('error:', error); // Print the error if one occurred
+		//console.log('statusCode:', responseNew && responseNew.statusCode); // Print the response status code if a response was received
 
 		var games_data = regexMatch(/<item>\s*(.*?)\s*<\/item>/g, body);
 
@@ -234,7 +238,7 @@ function get_game_data(games_array, sport){
 				})
 		};
 
-		console.log(games_array);
+		//console.log(games_array);
 	});
 
 }

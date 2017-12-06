@@ -4,7 +4,7 @@ window.addEventListener('load', function(){
     socket.on('message', function(nickname, message, time){
         addOne(nickname, message, time);
     });
-
+/**
     socket.on('membershipChanged', function(members){
         //console.log(members);
         $('#memberList').empty();
@@ -16,19 +16,20 @@ window.addEventListener('load', function(){
                 $('#memberList').append("<li><span class=\"member\"></span>" + members[i] + "</li><br>");
             }
         }
-
+**/
 
     });
     var meta = document.querySelector('meta[name=roomName]');
     var roomName = meta.content;
-
+    var nickname = meta.content1;
+/*
     var nickname = prompt('Enter a nickname: ');
     console.log(nickname);
 
     if(nickname ===''){
         nickname = 'Anonymous';
     }
-
+*/
     socket.emit('join', roomName, nickname, function(messages){
         addMessages(messages);
     });
