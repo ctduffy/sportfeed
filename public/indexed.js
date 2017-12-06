@@ -24,8 +24,8 @@ window.addEventListener('load', function(){
    		var user = document.querySelector('meta[name=nickname]').content;
    		socket.emit('like', sport, user);
 	});
-	var submitform = document.getElementById('loginForm');
-	submitform.addEventListener('submit', function(event){ 
+	var submitform = document.getElementById('roomForm');
+	submitform.addEventListener('submit', function(event){
 		alert("ya");
         event.preventDefault();
         name = document.getElementById('nameField').value;
@@ -35,5 +35,3 @@ window.addEventListener('load', function(){
 socket.on('retry', function(){
 	alert('that room already exists! try a different name or find it in the box of already existing rooms');
 });
-
-
