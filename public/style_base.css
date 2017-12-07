@@ -251,7 +251,6 @@ header .current a, #info .current{
 	text-align: center;
 }
 
-
 #chat-area2{
 	width: 96%;
 	margin: auto;
@@ -325,7 +324,7 @@ header .current a, #info .current{
 
 #roomForm input[type=submit]{
 	float:right;
-	width:30%;
+	width:32%;
 	height:35px;
 	display:inline;
 }
@@ -339,5 +338,5 @@ header .current a, #info .current{
     color: #fff;
 		float:right;
 		display:inline;
-		width: 25%;
+		width: 32%;
 }
