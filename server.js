@@ -26,33 +26,24 @@ io.sockets.on('connection', function(socket){
 
 	socket.on('nickname', function(nickname, callbacks){
 		var exists = 0;
-		var old = conn.query('SELECT * FROM users WHERE name = $1', nickname);
-		old.on('data', function(row){
+		conn.query('SELECT * FROM users WHERE name = $1', nickname)
+		.on('data', function(row){
 			exists = 1;
 			on = row.on;
 		});
 		old.on('end', function(){
 			if(exists == 0){
-				var num = 1;
-				var newuser = conn.query("INSERT INTO users (Name, on) VALUES ($1, $2)", nickname, num);
-				console.log(newuser);
-				newuser.on('end', function(){
-					console.log("curious");
-					callbacks(true);
-				});
+				var newuser = conn.query("INSERT INTO users (Name) VALUES ($1)", nickname);
+				console.log("curious");
+				callbacks(true);
 			}
 			else{
 				if(on == 1){
 						callbacks(false);
 					}
 				else{
-						var usere = conn.query("UPDATE users SET (on=0) WHERE Name = $1", nickname);
-						usere.on('rows', function(){
-						
-						});
-						usere.on('end', function(){
-							callbacks(true);
-						});
+						var usere = conn.query("UPDATE users SET (on = 1) WHERE Name = $1", nickname);
+						callbacks(true);
 					}
 			}
 		});
@@ -122,12 +113,7 @@ io.sockets.on('connection', function(socket){
 });
 
 function deleteMember(nickname){
-	var nicknames = users.map(function(user){
-		if(user!=nickname){
-			return user;
-		}
-	});
-	users = nicknames;
+	var usere = conn.query("UPDATE users SET (on=0) WHERE Name = $1", nickname);
 }
 /*
 function broadcastMembership(roomName){
@@ -161,7 +147,6 @@ app.get('/', function(request, response){
 
 app.get('/New/:name/:user', function(request, response){ //if there is a request for a new room, create a random name and redirect the user to the page with that as its name
 	generateRoomIdentifier(request.params.name, function(worked){
-		console.log(worked)
 		response.redirect('/index/' + request.params.user);
 	});
 });
@@ -175,10 +160,13 @@ app.get('/:roomName/:nickname', function(request, response){ //finds room and ta
 		scrape_sport_scores(request, response, "rooms", "room");
 		// this code is executed after all rows have been returned
 	});
-
 	q.on('err', function(){
 		//response.write('there is nothing here');
-		console.log('room requested doesnt exist');
+		z = conn.query('INSERT INTO Rooms VALUES ($1)', [request.params.RoomName]);
+		z.on('data', function(row){
+			response.redirect('/'+ request.params.RoomName + '/' + request.params.nickname);
+		})
+
 	});
 
 	var name = request.params.roomName; // 'ABC123' // ...
