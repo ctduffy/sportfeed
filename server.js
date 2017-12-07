@@ -213,7 +213,7 @@ function get_game_data(games_array, sport){
 		for (var i = 0; i < games_data.length; i++) {
 				var info = regexMatch(/<title>\s*(.*?)\s*<\/title>/g, games_data[i])[0];
 				var score = info.split(': ')[2].split('-');
-				var id = regexMatch(/<guid>\s*(.*?)\s*<\/guid>/g, games_data[i])[0];
+				var id = regexMatch(/<guid>\s*(.*?)\s*<\/guid>/g, games_data[i])[0].split('livescore/')[1].replace('/', '-').replace('/', '');
 				games_array.push({
 						'name_team1': regexMatch(/\) #\s*(.*?)\s* vs #/g, info)[0],
 						'name_team2': regexMatch(/vs #\s*(.*?)\s*:/g, info)[0],
@@ -221,7 +221,7 @@ function get_game_data(games_array, sport){
 						'score_team2': score[1],
 						'status': regexMatch(/<description>\s*(.*?)\s*<\/description>/g, games_data[i])[0],
 						'sport': sport,
-						'id': id.split('livescore/')[1].replace('/', '-').replace('/', '-')
+						'id': id
 				})
 		};
 
@@ -248,7 +248,7 @@ function scrape_sport_scores(request, response, rooms, render_type){
 				var status = "";
 				if (score[2].includes("Goal for")) status = "Goal Scored";
 				else status = score[2];
-				var id = regexMatch(/<link>\s*(.*?)\s*<\/link>/g, games_data[i])[0];
+				var id = regexMatch(/<link>\s*(.*?)\s*<\/link>/g, games_data[i])[0].split('livescore/')[1].replace('/', '-').replace('/', '');
 				games_array.push({
 						'name_team1': info[0],
 						'name_team2': info[1],
@@ -256,7 +256,7 @@ function scrape_sport_scores(request, response, rooms, render_type){
 						'score_team2': score[1],
 						'status': status,
 						'sport': "Soccer",
-						'id': id.split('livescore/')[1].replace('/', '-').replace('/', '-')
+						'id': id
 				})
 		};
 
