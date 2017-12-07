@@ -273,7 +273,6 @@ function scrape_sport_scores(request, response, rooms, render_type){
 		};
 
 		var sports_likes_keys = {"Football": 0, "Basketball": 0, "Hockey": 0, "Baseball": 0, "Soccer": 0}
-		var sports = ["Football", "Basketball", "Hockey", "Baseball", "Soccer"]
 		var s = conn.query('SELECT * FROM Users WHERE Name = $1', request.params.nickname);
 		s.on('data', function(row){
 			current_id = row.id;

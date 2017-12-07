@@ -9,9 +9,33 @@
 		<script src="/login.js"></script>
 	</head>
 	<body>
-		<form method="POST" onsubmit="return true" action="/index" id="loginForm"> 
-				<input type="text" name="message" id="nameField">
-				<input type="submit" id="submitButton" value="Send">
-		</form>
+
+		<header id="branding">
+			<div class="container">
+				<div>
+					<h1 class="highlight">SportFeed</h1>
+				</div>
+			</div>
+		</header>
+
+		<div id="login_container">
+			<div id="login_top">
+				<label>Name:</label>
+			</div>
+			<form method="POST" onsubmit="return true" action="/index" id="loginForm">
+					<input type="text" name="message" id="nameField">
+					<input type="submit" id="loginButton" value="Enter">
+			</form>
+
+
+		</div>
+
+		<div id="page_info">
+			<label id="about_us">About Us</label>
+			<p>
+				Sportfeed is a sports website that shows fans real time sports updates and users can see other users’ reactions in chat rooms. There are chat rooms for each sport in which users can react to every play, call, event, or score that happens in real time.  In addition, users can also create their own chat rooms for free discussion.  We hope to connect users over their common love of sports!
+			</p>
+		</div>
+
 	</body>
 </html>
