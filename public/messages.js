@@ -4,34 +4,12 @@ window.addEventListener('load', function(){
     socket.on('message', function(nickname, message, time){
         addOne(nickname, message, time);
     });
-/**
-    socket.on('membershipChanged', function(members){
-        //console.log(members);
-        $('#memberList').empty();
-        //console.log('#memberList');
-        //console.log(members.length);
-        for(var i = 0; i < members.length; i++){
-            //console.log(members[i]);
-            if(members[i] != null){
-                $('#memberList').append("<li><span class=\"member\"></span>" + members[i] + "</li><br>");
-            }
-        }
-
-
-    });**/
     var meta = document.querySelector('meta[name=roomName]');
     var roomName = meta.content;
     var meta1 = document.querySelector('meta[name=nickname]');
     var nickname = meta1.content;
     console.log(nickname);
-/*
-    var nickname = prompt('Enter a nickname: ');
-    console.log(nickname);
 
-    if(nickname ===''){
-        nickname = 'Anonymous';
-    }
-*/
     socket.emit('join', roomName, nickname, function(messages){
         addMessages(messages);
     });
@@ -60,8 +38,6 @@ function addOne(nickname, message, time){
 }
 
 function addMessages(messages){
-    //console.log(messages);
-    //var data = JSON.parse(messages);
     var data=messages;
     for (var i = 0; i < data.length; i++) {
     // have to check if this message is already here

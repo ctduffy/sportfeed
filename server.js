@@ -53,11 +53,6 @@ io.sockets.on('connection', function(socket){
 		socket.join(roomName);
 		socket.nickname = nickname;
 		socket.room = roomName;
-		//console.log(socket.room)
-		//console.log(roomName);
-		//console.log(nickname);
-
-		//broadcastMembership(roomName);
 
 		var messages = []; //put messages here
 
@@ -67,7 +62,6 @@ io.sockets.on('connection', function(socket){
 
 		});
 		m.on('end', function(){
-			//console.log(messages);
 			callback(messages);
 		});
 	});
@@ -80,7 +74,6 @@ io.sockets.on('connection', function(socket){
 		var userid;
 		var l = conn.query('SELECT id FROM users WHERE Name = $1', user);
 		l.on('data', function(row){
-			//console.log(row.id);
 			userid = row.id;
 		});
 		l.on('end', function(){
@@ -89,23 +82,16 @@ io.sockets.on('connection', function(socket){
 	});
 
 	socket.on('message', function(message, roomName){
-		//console.log(message);
-		//console.log(roomName);
-		//var rooms = Object.keys(io.sockets.manager.roomClients[socket.id]);
-		//var roomName = (rooms[0] = '') ? rooms[1].substr(1) : rooms[0].substr(1);
 
 		var m = conn.query('INSERT INTO messages (RoomName, nickname, message) VALUES ($1, $2, $3)',[roomName, socket.nickname, message])
 
 		var currentdate = new Date();
 		var time = currentdate.getHours() + ":" + currentdate.getMinutes() + ":" + currentdate.getSeconds();
 
-		//console.log(time);
-
 		io.sockets.in(roomName).emit('message', socket.nickname, message, time);
 	});
 
 	socket.on('disconnect', function(){
-		//console.log(socket.nickname);
 		updateMember(socket.nickname, 0);
 	});
 
@@ -113,20 +99,8 @@ io.sockets.on('connection', function(socket){
 });
 
 function updateMember(nickname, which){
-	//console.log(which)
 	conn.query("UPDATE users SET ison = $1 WHERE Name = $2", [which, nickname]);
 }
-/*
-function broadcastMembership(roomName){
-	var sockets = io.sockets.clients(roomName);
-
-	var nicknames = sockets.map(function(socket){
-		return socket.nickname
-	});
-
-	console.log(nicknames);
-	io.sockets.in(roomName).emit('membershipChanged', nicknames);
-}*/
 
 app.get('/index/:nickname', function(request, response){ //homepage
 	//nickname is stored in request.params.nickname
@@ -263,14 +237,14 @@ function scrape_sport_scores(request, response, rooms, render_type){
 		};
 
 		var sports_likes_keys = {"Football": 0, "Basketball": 0, "Hockey": 0, "Baseball": 0, "Soccer": 0}
-		var s = conn.query('SELECT * FROM Users WHERE Name = $1', request.params.nickname);
+		var s = conn.query('SELECT * FROM Users WHERE Name = $1', request.params.nickname); // find id of current user
 		s.on('data', function(row){
 			current_id = row.id;
 		});
 		s.on('end', function(){
-			j = conn.query('SELECT * FROM likes WHERE UserId = $1', current_id)
+			j = conn.query('SELECT * FROM likes WHERE UserId = $1', current_id) //find all likes from this user 
 			j.on('data', function(row){
-				sports_likes_keys[row['sport']]++;
+				sports_likes_keys[row['sport']]++; // add a like to sport from returned row
 			});
 			j.on('end', function(){
 
