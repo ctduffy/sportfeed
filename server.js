@@ -48,7 +48,7 @@ io.sockets.on('connection', function(socket){
 				else{
 						var usere = conn.query("UPDATE users SET (on=0) WHERE Name = $1", nickname);
 						usere.on('rows', function(){
-						
+
 						});
 						usere.on('end', function(){
 							callbacks(true);
@@ -233,7 +233,7 @@ function get_game_data(games_array, sport){
 						'score_team2': score[1],
 						'status': regexMatch(/<description>\s*(.*?)\s*<\/description>/g, games_data[i])[0],
 						'sport': sport,
-						'id': id.split('livescore/')[1]
+						'id': id.split('livescore/')[1].replace('/', '-')
 				})
 		};
 
@@ -268,7 +268,7 @@ function scrape_sport_scores(request, response, rooms, render_type){
 						'score_team2': score[1],
 						'status': status,
 						'sport': "Soccer",
-						'id': id.split('livescore/')[1]
+						'id': id.split('livescore/')[1].replace('/', '-')
 				})
 		};
 

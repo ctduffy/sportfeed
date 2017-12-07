@@ -200,7 +200,6 @@ header .current a, #info .current{
 	height:90%;
 	max-height:100%;
 	width:100%;
-	overflow:scroll;
 }
 
 #messages-box{
@@ -224,6 +223,18 @@ header .current a, #info .current{
     min-width: 350px;
 }
 
+#room-box{
+	border: 2px solid #0f4d92;
+	border-radius: 8px;
+	margin: auto;
+	float:center;
+	background-color: #0f4d92;
+	height:90%;
+	max-height:100%;
+	width:100%;
+	overflow:scroll;
+}
+
 #room-name{
 	color: #fff;
 	font-size: 120%;
@@ -231,6 +242,7 @@ header .current a, #info .current{
 	float:center;
 	border-bottom: #2ECC71 3px solid;
 }
+
 #room{
 	display:inline-block;
 	padding-top: .5%;
@@ -238,6 +250,7 @@ header .current a, #info .current{
 	float:center;
 	text-align: center;
 }
+
 
 #chat-area2{
 	width: 96%;
