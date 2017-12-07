@@ -148,13 +148,6 @@ app.get('/:roomName/:nickname', function(request, response){ //finds room and ta
 	var name = request.params.roomName;
 });
 
-function compare(a,b) {
-  if (a.last_nom < b.last_nom)
-	return -1;
-  if (a.last_nom > b.last_nom)
-	return 1;
-  return 0;
-}
 function generateRoomIdentifier(name, callback) { //creates random name for all new rooms
 	var tried = 0
 	var z = conn.query('SELECT * FROM Rooms WHERE RoomName == $1', [name]);
@@ -250,7 +243,7 @@ function scrape_sport_scores(request, response, rooms, render_type){
 			current_id = row.id;
 		});
 		s.on('end', function(){
-			j = conn.query('SELECT * FROM likes WHERE UserId = $1', current_id) //find all likes from this user 
+			j = conn.query('SELECT * FROM likes WHERE UserId = $1', current_id) //find all likes from this user
 			j.on('data', function(row){
 				sports_likes_keys[row['sport']]++; // add a like to sport from returned row
 			});
