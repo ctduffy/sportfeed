@@ -34,7 +34,6 @@ io.sockets.on('connection', function(socket){
 		old.on('end', function(){
 			if(exists == 0){
 				var newuser = conn.query("INSERT INTO users (Name) VALUES ($1)", nickname);
-				console.log("curious");
 				callbacks(true);
 			}
 			else{
@@ -80,11 +79,11 @@ io.sockets.on('connection', function(socket){
 		var userid;
 		var l = conn.query('SELECT id FROM users WHERE Name = $1', user);
 		l.on('data', function(row){
-			console.log(row.id);
+			//console.log(row.id);
 			userid = row.id;
 		});
 		l.on('end', function(){
-			var n = conn.query('INSERT INTO likes (UserId, sport) VALUES ($1, $2)', [userid, sport]);
+			conn.query('INSERT INTO likes (UserId, sport) VALUES ($1, $2)', [userid, sport]);
 		})
 	});
 
@@ -105,15 +104,15 @@ io.sockets.on('connection', function(socket){
 	});
 
 	socket.on('disconnect', function(){
-		room = socket.room;
-		deleteMember(socket.nickname);
+		//console.log(socket.nickname);
+		updateMember(0, socket.nickname);
 	});
 
 
 });
 
-function deleteMember(nickname){
-	var usere = conn.query("UPDATE users SET (on=0) WHERE Name = $1", nickname);
+function updateMember(nickname, which){
+	conn.query("UPDATE users SET ison = $1 WHERE Name = $2", [which, nickname]);
 }
 /*
 function broadcastMembership(roomName){
@@ -128,7 +127,8 @@ function broadcastMembership(roomName){
 }*/
 
 app.get('/index/:nickname', function(request, response){ //homepage
-	//nickname is stored in req.params.nickname
+	//nickname is stored in request.params.nickname
+	updateMember(1, request.params.nickname);
 	var rooms = [];
 	var q = conn.query('SELECT * FROM Rooms');
 	q.on('data', function(row){
@@ -152,7 +152,8 @@ app.get('/New/:name/:user', function(request, response){ //if there is a request
 });
 
 app.get('/:roomName/:nickname', function(request, response){ //finds room and takes user to the page and fills out the room template so that it appears as the correct room
-	var q = conn.query('SELECT * FROM Rooms WHERE RoomName = $1', [request.params.roomName]);
+	updateMember(1, request.params.nickname);
+	var q = conn.query('SELECT * FROM Rooms WHERE RoomName = $1', request.params.roomName);
 	q.on('data', function(row){
 
 	});
@@ -161,9 +162,8 @@ app.get('/:roomName/:nickname', function(request, response){ //finds room and ta
 		// this code is executed after all rows have been returned
 	});
 	q.on('err', function(){
-		//response.write('there is nothing here');
-		z = conn.query('INSERT INTO Rooms VALUES ($1)', [request.params.RoomName]);
-		z.on('data', function(row){
+		conn.query('INSERT INTO Rooms VALUES ($1)', [request.params.RoomName])
+		.on('data', function(row){
 			response.redirect('/'+ request.params.RoomName + '/' + request.params.nickname);
 		})
 
