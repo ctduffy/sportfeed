@@ -24,23 +24,23 @@ var users = [];
 
 io.sockets.on('connection', function(socket){
 
-	socket.on('nickname', function(nickname, callbacks){
+	socket.on('nickname', function(nickname, callbacks){ //upon request to investigate nickname, ensures existence in database, and returns false if it is currently being used
 		var exists = 0;
 		conn.query('SELECT * FROM users WHERE name = $1', nickname)
-		.on('data', function(row){
-			exists = 1;
-			on = row.ison;
+		.on('data', function(row){ //if it exists in the database already
+			exists = 1; 
+			on = row.ison; //check if the user is currently on
 		})
 		.on('end', function(){
-			if(exists == 0){
+			if(exists == 0){ //if it doesnt exist yet, add to database and return true to callback
 				conn.query("INSERT INTO users (Name) VALUES ($1)", nickname);
 				callbacks(true);
 			}
 			else{
 				if(on == 1){
-						callbacks(false);
+						callbacks(false); //if it is currently being used return false
 					}
-				else{
+				else{ //otherwise return true and set ison (marker of if in use) to true
 						conn.query("UPDATE users SET ison = 1 WHERE Name = $1", nickname);
 						callbacks(true);
 					}
@@ -50,48 +50,47 @@ io.sockets.on('connection', function(socket){
 
 	socket.on('join', function(roomName, nickname, callback){
 		updateMember(nickname, 1);
-		socket.join(roomName);
-		socket.nickname = nickname;
+		socket.join(roomName); //when you join a room, join that socket room
+		socket.nickname = nickname; //set the socket nickname to users name
 		socket.room = roomName;
 
 		var messages = []; //put messages here
 
-		var m = conn.query('SELECT * FROM messages WHERE RoomName = $1',roomName);
+		var m = conn.query('SELECT * FROM messages WHERE RoomName = $1',roomName); //get all messages where roomname matches current roomname
 		m.on('data', function(row){
 			messages.push(row);
-
 		});
 		m.on('end', function(){
-			callback(messages);
+			callback(messages); //send messages back to the user
 		});
 	});
 
 	socket.on('nickname', function(nickname){
-		socket.nickname = nickname;
+		socket.nickname = nickname; //sets socket nickname
 	});
 
-	socket.on('like', function(sport, user){
+	socket.on('like', function(sport, user){ //when a user likes a sport, add it to the table likes with the sport and user id
 		var userid;
-		var l = conn.query('SELECT id FROM users WHERE Name = $1', user);
+		var l = conn.query('SELECT id FROM users WHERE Name = $1', user); //get user id
 		l.on('data', function(row){
 			userid = row.id;
 		});
 		l.on('end', function(){
-			conn.query('INSERT INTO likes (UserId, sport) VALUES ($1, $2)', [userid, sport]);
+			conn.query('INSERT INTO likes (UserId, sport) VALUES ($1, $2)', [userid, sport]); //insert sport and user id into table
 		})
 	});
 
-	socket.on('message', function(message, roomName){
+	socket.on('message', function(message, roomName){ //when a message is sent 
 
-		var m = conn.query('INSERT INTO messages (RoomName, nickname, message) VALUES ($1, $2, $3)',[roomName, socket.nickname, message])
+		var m = conn.query('INSERT INTO messages (RoomName, nickname, message) VALUES ($1, $2, $3)',[roomName, socket.nickname, message]) //insert message into database
 
-		var currentdate = new Date();
+		var currentdate = new Date(); //get date
 		var time = currentdate.getHours() + ":" + currentdate.getMinutes() + ":" + currentdate.getSeconds();
 
-		io.sockets.in(roomName).emit('message', socket.nickname, message, time);
+		io.sockets.in(roomName).emit('message', socket.nickname, message, time); //send message to all users/sockets in the database
 	});
 
-	socket.on('disconnect', function(){
+	socket.on('disconnect', function(){ //when a user disconnects update their status in the database
 		updateMember(socket.nickname, 0);
 	});
 
@@ -129,7 +128,7 @@ app.get('/New/:name/:user', function(request, response){ //if there is a request
 
 app.get('/:roomName/:nickname', function(request, response){ //finds room and takes user to the page and fills out the room template so that it appears as the correct room
 	updateMember(request.params.nickname, 1);
-	var q = conn.query('SELECT * FROM Rooms WHERE RoomName = $1', request.params.roomName);
+	var q = conn.query('SELECT * FROM Rooms WHERE RoomName = $1', request.params.roomName); //gets room 
 	q.on('data', function(row){
 
 	});
@@ -138,17 +137,17 @@ app.get('/:roomName/:nickname', function(request, response){ //finds room and ta
 		// this code is executed after all rows have been returned
 	});
 	q.on('err', function(){
-		conn.query('INSERT INTO Rooms VALUES ($1)', [request.params.RoomName])
+		conn.query('INSERT INTO Rooms VALUES ($1)', [request.params.RoomName]) 
 		.on('data', function(row){
 			response.redirect('/'+ request.params.RoomName + '/' + request.params.nickname);
-		})
+		});
 
 	});
 
 	var name = request.params.roomName;
 });
 
-function compare(a,b) {
+function compare(a,b) { //compares a and b and return 0 if theyre the same
   if (a.last_nom < b.last_nom)
 	return -1;
   if (a.last_nom > b.last_nom)
