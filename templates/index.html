@@ -22,7 +22,7 @@
 				<ul id="scores-list">
 					{{#games_array}}
 					<li>
-						<div>
+						<div id={{id}}>
 							<div class="like_area" id="{{sport}}">
 								<button type="button" id="like_button"><img src="/heart.jpg" style="width:20px;height:20px;"></button>
 							</div>
@@ -44,6 +44,7 @@
 			<div class="container">
 				<div id="chat-area">
 					<div id="chat-box">
+
 						<div id="room-name">Chat Rooms</div>
 
 						<div id="messages-box">
@@ -55,6 +56,7 @@
 						</div>
 
 					</div>
+
 					<form method="POST" onsubmit="return true" id="roomForm">
 						<input type="text" name="message" id="nameField">
 						<input type="submit" id="submit_room_button" value="Create Room">
