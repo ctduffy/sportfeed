@@ -171,7 +171,7 @@ app.get('/:roomName/:nickname', function(request, response){ //finds room and ta
 
 	});
 
-	var name = request.params.roomName; // 'ABC123' // ...
+	var name = request.params.roomName;
 });
 
 function compare(a,b) {
@@ -198,6 +198,7 @@ function generateRoomIdentifier(name, callback) { //creates random name for all 
 	});
 };
 
+// function that return matches of text in a substring using regular expressions (regex)
 function regexMatch(regex, data){
 	var matches = [];
 	while (m = regex.exec(data)) {
@@ -206,13 +207,15 @@ function regexMatch(regex, data){
 	return matches;
 }
 
+// function that scrapes game data for sport games
 function get_game_data(games_array, sport){
-
+	// get html of page using request module
 	request_library('https://www.scorespro.com/rss2/live-'+sport.toLowerCase()+'.xml', function (error, responseNew, body) {
-
+		// get html block that contains the info we want (all instances of games) using regexMatch a function we created to utilize regular expressions
 		var games_data = regexMatch(/<item>\s*(.*?)\s*<\/item>/g, body);
-
+		// loop through each game html
 		for (var i = 0; i < games_data.length; i++) {
+				// using regular expressions, get the text we want to display to the user, which is the team names, the team scores, status of the game, sport, and a unique game ID
 				var info = regexMatch(/<title>\s*(.*?)\s*<\/title>/g, games_data[i])[0];
 				var score = info.split(': ')[2].split('-');
 				var id = regexMatch(/<guid>\s*(.*?)\s*<\/guid>/g, games_data[i])[0].split('livescore/')[1].replace('/', '-').replace('/', '');
@@ -231,10 +234,12 @@ function get_game_data(games_array, sport){
 
 }
 
+// this function gets all sport scores and renders the sports scores banner in html
 function scrape_sport_scores(request, response, rooms, render_type){
-
+	// used to store all the games
 	var games_array = []
 
+	// scrape game data for sports
 	get_game_data(games_array, "Football");
 	get_game_data(games_array, "Basketball");
 	get_game_data(games_array, "Hockey");
@@ -242,9 +247,11 @@ function scrape_sport_scores(request, response, rooms, render_type){
 
 	// function for scraping soccer data is slightly different due to differences in the website we are scraping
 	request_library('https://www.scorespro.com/rss2/live-soccer.xml', function (error, responseNew, body) {
-
+		// get html block that contains the info we want (all instances of games) using regexMatch a function we created to utilize regular expressions
 		var games_data = regexMatch(/<item>\s*(.*?)\s*<\/item>/g, body);
+		// loop through each game html
 		for (var i = 0; i < games_data.length; i++) {
+				// using regular expressions, get the text we want to display to the user, which is the team names, the team scores, status of the game, sport, and a unique game ID
 				var info = (regexMatch(/\) \s*(.*?)\s*: /g, games_data[i])[0]).split(' vs ');
 				var score = regexMatch(/<description>\s*(.*?)\s*<\/description>/g, games_data)[0].split(': ')[1].split('-');
 				var status = "";
@@ -262,6 +269,7 @@ function scrape_sport_scores(request, response, rooms, render_type){
 				})
 		};
 
+		// initialize a dictionary for storing a user's likes of sports
 		var sports_likes_keys = {"Football": 0, "Basketball": 0, "Hockey": 0, "Baseball": 0, "Soccer": 0}
 		var s = conn.query('SELECT * FROM Users WHERE Name = $1', request.params.nickname);
 		s.on('data', function(row){
@@ -274,12 +282,15 @@ function scrape_sport_scores(request, response, rooms, render_type){
 			});
 			j.on('end', function(){
 
+				// sort the games_array based on the number of user likes for each sport by using sports_likes_keys dictionary
 				games_array.sort(function(a, b) {
 					if(sports_likes_keys[a.sport] < sports_likes_keys[b.sport]) return 1;
 					if(sports_likes_keys[a.sport] > sports_likes_keys[b.sport]) return -1;
 					return 0;
 				});
 
+				// render a certain html page (index or room) based on what is passed in
+				// pass in certain variables including the games_array to display on the html page
 				if(render_type == "index") response.render('index.html',{nickname: request.params.nickname, roomlist: rooms, games_array: games_array});
 				else if (render_type == "room") response.render('room.html', {roomName: request.params.roomName, nickname: request.params.nickname, games_array: games_array});
 
