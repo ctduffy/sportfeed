@@ -75,14 +75,16 @@ header .current a, #info .current{
 
 /* Login Page */
 #login_top{
-	margin-top:70px;
+
 	font-size:25px;
 }
 
 #login_container{
-	width: 40%;
+	width: 30%;
 	margin: auto;
 	overflow: hidden;
+	margin-top:70px;
+	text-align: center;
 }
 
 #loginForm input{
@@ -91,11 +93,15 @@ header .current a, #info .current{
   border-radius: 4px;
 	font-size: 20px;
 	color: #000;
+	width: 98%;
+	text-align: center;
 }
 
 #loginForm input[type=submit]{
 	height:37px;
-	color: #2ECC71;
+	color: #fff;
+	background: #2ECC71;
+	margin-top: 5px;
 	margin-bottom: 60px;
 }
 
