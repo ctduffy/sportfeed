@@ -6,7 +6,9 @@ window.addEventListener('load', function(){
         name = document.getElementById('nameField').value;
         event.preventDefault();
         socket.emit('nickname', name, function(bool){
+        	alert(bool);
         	if(bool){
+
         		window.location = "/index/" + name;
         	}
         	else{

@@ -24,37 +24,39 @@ var users = [];
 
 io.sockets.on('connection', function(socket){
 
-	socket.on('nickname', function(nickname, callback){
+	socket.on('nickname', function(nickname, callbacks){
 		var exists = 0;
 		var old = conn.query('SELECT * FROM users WHERE name = $1', nickname);
 		old.on('data', function(row){
 			exists = 1;
+			on = row.on;
 		});
 		old.on('end', function(){
 			if(exists == 0){
-				var newuser = conn.query("INSERT INTO users (Name) VALUES ($1)", nickname);
+				var num = 1;
+				var newuser = conn.query("INSERT INTO users (Name, on) VALUES ($1, $2)", nickname, num);
+				console.log(newuser);
 				newuser.on('end', function(){
-					console.log(nickname);
-					if(users.indexOf(nickname) > -1){
-						callback(false);
-					}
-					else{
-						users.push(nickname);
-						callback(true);
-					}
+					console.log("curious");
+					callbacks(true);
 				});
 			}
 			else{
-				if(users.indexOf(nickname) > -1){
-						callback(false);
+				if(on == 1){
+						callbacks(false);
 					}
 				else{
-						users.push(nickname);
-						callback(true);
+						var usere = conn.query("UPDATE users SET (on=0) WHERE Name = $1", nickname);
+						usere.on('rows', function(){
+						
+						});
+						usere.on('end', function(){
+							callbacks(true);
+						});
 					}
 			}
 		});
-	})
+	});
 
 	socket.on('join', function(roomName, nickname, callback){
 		socket.join(roomName);
