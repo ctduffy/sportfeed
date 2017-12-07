@@ -29,11 +29,11 @@ io.sockets.on('connection', function(socket){
 		conn.query('SELECT * FROM users WHERE name = $1', nickname)
 		.on('data', function(row){
 			exists = 1;
-			on = row.on;
+			on = row.ison;
 		})
 		.on('end', function(){
 			if(exists == 0){
-				var newuser = conn.query("INSERT INTO users (Name) VALUES ($1)", nickname);
+				conn.query("INSERT INTO users (Name) VALUES ($1)", nickname);
 				callbacks(true);
 			}
 			else{
@@ -41,7 +41,7 @@ io.sockets.on('connection', function(socket){
 						callbacks(false);
 					}
 				else{
-						conn.query("UPDATE users SET (on = 1) WHERE Name = $1", nickname);
+						conn.query("UPDATE users SET ison = 1 WHERE Name = $1", nickname);
 						callbacks(true);
 					}
 			}
@@ -49,6 +49,7 @@ io.sockets.on('connection', function(socket){
 	});
 
 	socket.on('join', function(roomName, nickname, callback){
+		updateMember(nickname, 1);
 		socket.join(roomName);
 		socket.nickname = nickname;
 		socket.room = roomName;
@@ -105,13 +106,14 @@ io.sockets.on('connection', function(socket){
 
 	socket.on('disconnect', function(){
 		//console.log(socket.nickname);
-		updateMember(0, socket.nickname);
+		updateMember(socket.nickname, 0);
 	});
 
 
 });
 
 function updateMember(nickname, which){
+	//console.log(which)
 	conn.query("UPDATE users SET ison = $1 WHERE Name = $2", [which, nickname]);
 }
 /*
@@ -128,7 +130,7 @@ function broadcastMembership(roomName){
 
 app.get('/index/:nickname', function(request, response){ //homepage
 	//nickname is stored in request.params.nickname
-	updateMember(1, request.params.nickname);
+	updateMember(request.params.nickname, 1);
 	var rooms = [];
 	var q = conn.query('SELECT * FROM Rooms');
 	q.on('data', function(row){
@@ -152,7 +154,7 @@ app.get('/New/:name/:user', function(request, response){ //if there is a request
 });
 
 app.get('/:roomName/:nickname', function(request, response){ //finds room and takes user to the page and fills out the room template so that it appears as the correct room
-	updateMember(1, request.params.nickname);
+	updateMember(request.params.nickname, 1);
 	var q = conn.query('SELECT * FROM Rooms WHERE RoomName = $1', request.params.roomName);
 	q.on('data', function(row){
 
