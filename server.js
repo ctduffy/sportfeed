@@ -221,7 +221,7 @@ function get_game_data(games_array, sport){
 						'score_team2': score[1],
 						'status': regexMatch(/<description>\s*(.*?)\s*<\/description>/g, games_data[i])[0],
 						'sport': sport,
-						'id': id.split('livescore/')[1].replace('/', '-')
+						'id': id.split('livescore/')[1].replace('/', '-').replace('/', '-')
 				})
 		};
 
@@ -256,7 +256,7 @@ function scrape_sport_scores(request, response, rooms, render_type){
 						'score_team2': score[1],
 						'status': status,
 						'sport': "Soccer",
-						'id': id.split('livescore/')[1].replace('/', '-')
+						'id': id.split('livescore/')[1].replace('/', '-').replace('/', '-')
 				})
 		};
 
