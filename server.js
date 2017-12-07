@@ -30,8 +30,8 @@ io.sockets.on('connection', function(socket){
 		.on('data', function(row){
 			exists = 1;
 			on = row.on;
-		});
-		old.on('end', function(){
+		})
+		.on('end', function(){
 			if(exists == 0){
 				var newuser = conn.query("INSERT INTO users (Name) VALUES ($1)", nickname);
 				callbacks(true);
